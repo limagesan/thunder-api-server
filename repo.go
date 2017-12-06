@@ -29,9 +29,6 @@ func RepoCreateEvent(e Event) Event {
 	e.ID = currentID
 	e.CloseTime = time.Now()
 	e.OpenTime = time.Now()
-	e.Description = "結成1周年に作成したアルバムのリリース記念ライブです"
-	e.Coordinate = Coordinate{Latitude: 35.871236, Longitude: 139.6427601}
-	e.ImageURL = "https://i.ytimg.com/vi/mTpczxY5r8o/maxresdefault.jpg"
 	events = append(events, e)
 	return e
 }

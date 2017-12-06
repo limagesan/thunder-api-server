@@ -10,7 +10,7 @@ import (
 
 func IDShouldBeInt(h httprouter.Handle, name string) httprouter.Handle {
 	return CommonHeaders(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		idParam := ps.ByName("todoId")
+		idParam := ps.ByName("eventId")
 		_, err := strconv.Atoi(idParam)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")

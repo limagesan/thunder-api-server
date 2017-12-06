@@ -15,25 +15,25 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprintf(w, "Welcmoe!")
 }
 
-func TodoIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func EventIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
 
-	if err := json.NewEncoder(w).Encode(todos); err != nil {
+	if err := json.NewEncoder(w).Encode(events); err != nil {
 		panic(err)
 	}
 }
 
-func TodoShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id, _ := strconv.Atoi(ps.ByName("todoId"))
-	t := RepoFindTodo(id)
-	if t.ID == 0 && t.Name == "" {
+func EventShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("eventId"))
+	t := RepoFindEvent(id)
+	if t.ID == 0 && t.Title == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 }
 
-func TodoCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var todo Todo
+func EventCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var event Event
 
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 
@@ -42,7 +42,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	defer r.Body.Close()
 
-	if err := json.Unmarshal(body, &todo); err != nil {
+	if err := json.Unmarshal(body, &event); err != nil {
 		w.WriteHeader(500)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
@@ -50,7 +50,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	t := RepoCreateTodo(todo)
+	t := RepoCreateEvent(event)
 	location := fmt.Sprintf("http://%s/%d", r.Host, t.ID)
 	w.Header().Set("Location", location)
 	w.WriteHeader(http.StatusCreated)
@@ -59,9 +59,9 @@ func TodoCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 }
 
-func TodoDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id, _ := strconv.Atoi(ps.ByName("todoId"))
-	if err := RepoDestroyTodo(id); err != nil {
+func EventDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("eventId"))
+	if err := RepoDestroyEvent(id); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)

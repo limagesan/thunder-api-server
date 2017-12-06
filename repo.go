@@ -1,40 +1,48 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 var (
-	todos     Todos
+	events    Events
 	currentID int
 )
 
 func init() {
-	RepoCreateTodo(Todo{Name: "Write presentation"})
-	RepoCreateTodo(Todo{Name: "Host meetup"})
+	RepoCreateEvent(Event{Title: "Write presentation"})
+	RepoCreateEvent(Event{Title: "Host meetup"})
 }
 
-func RepoFindTodo(id int) Todo {
-	for _, t := range todos {
+func RepoFindEvent(id int) Event {
+	for _, t := range events {
 		if t.ID == id {
 			return t
 		}
 	}
-	return Todo{}
+	return Event{}
 }
 
-func RepoCreateTodo(t Todo) Todo {
+func RepoCreateEvent(e Event) Event {
 	currentID += 1
-	t.ID = currentID
-	todos = append(todos, t)
-	return t
+	e.ID = currentID
+	e.CloseTime = time.Now()
+	e.OpenTime = time.Now()
+	e.Description = "結成1周年に作成したアルバムのリリース記念ライブです"
+	e.Coordinate = Coordinate{Latitude: 35.871236, Longitude: 139.6427601}
+	e.ImageURL = "https://i.ytimg.com/vi/mTpczxY5r8o/maxresdefault.jpg"
+	events = append(events, e)
+	return e
 }
 
-func RepoDestroyTodo(id int) error {
-	for i, t := range todos {
+func RepoDestroyEvent(id int) error {
+	for i, t := range events {
 		if t.ID == id {
-			todos = append(todos[:i], todos[i+1:]...)
+			events = append(events[:i], events[i+1:]...)
 			return nil
 		}
 	}
 
-	return fmt.Errorf("Could not find Todo with id of %d to delete", id)
+	return fmt.Errorf("Could not find Event with id of %d to delete", id)
 }

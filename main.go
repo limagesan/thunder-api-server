@@ -14,10 +14,10 @@ func main() {
 		port = "8080"
 	}
 	router := httprouter.New()
-	router.GET("/todos", CommonHeaders(TodoIndex, "todo-index"))
-	router.GET("/todos/:todoId", IDShouldBeInt(TodoShow, "todo-show"))
-	router.POST("/todos", CommonHeaders(TodoCreate, "todo-create"))
-	router.DELETE("/todos/:todoId", IDShouldBeInt(TodoDelete, "todo-delete"))
+	router.GET("/events", CommonHeaders(EventIndex, "event-index"))
+	router.GET("/events/:eventId", IDShouldBeInt(EventShow, "event-show"))
+	router.POST("/events", CommonHeaders(EventCreate, "event-create"))
+	router.DELETE("/events/:eventId", IDShouldBeInt(EventDelete, "event-delete"))
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

@@ -3,13 +3,14 @@ package main
 import "time"
 
 type Event struct {
-	ID          int        `json:"id"`
-	Title       string     `json:"title"`
-	OpenTime    time.Time  `json:"openTime"`
-	CloseTime   time.Time  `json:"closeTime"`
-	Description string     `json:"description"`
-	ImageURL    string     `json:"imageUrl"`
-	Coordinate  Coordinate `json:"coordinate"`
+	ID           int        `json:"id"`
+	Title        string     `json:"title"`
+	LocationName string     `json:"locationName"`
+	OpenTime     time.Time  `json:"openTime"`
+	CloseTime    time.Time  `json:"closeTime"`
+	Description  string     `json:"description"`
+	ImageURL     string     `json:"imageURL"`
+	Coordinate   Coordinate `json:"coordinate"`
 }
 
 type Coordinate struct {

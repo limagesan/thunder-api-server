@@ -11,8 +11,8 @@ var (
 )
 
 func init() {
-	RepoCreateEvent(Event{Title: "Write presentation"})
-	RepoCreateEvent(Event{Title: "Host meetup"})
+	RepoCreateEvent(Event{Title: "中村パーキングYOYOライブ", LocationName: "北浦和Kyara"})
+	RepoCreateEvent(Event{Title: "Freebeeがやっちゃるけえ", LocationName: "北浦和エアーズ"})
 }
 
 func RepoFindEvent(id int) Event {

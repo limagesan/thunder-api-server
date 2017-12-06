@@ -14,6 +14,7 @@ func main() {
 		port = "8080"
 	}
 	router := httprouter.New()
+	router.GET("/", Logging(Index, "index"))
 	router.GET("/events", CommonHeaders(EventIndex, "event-index"))
 	router.GET("/events/:eventId", IDShouldBeInt(EventShow, "event-show"))
 	router.POST("/events", CommonHeaders(EventCreate, "event-create"))

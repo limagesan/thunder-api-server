@@ -12,7 +12,8 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintf(w, "Welcmoe!")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	fmt.Fprintf(w, "{\"greeting\":\"Welcome!\"}")
 }
 
 func EventIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

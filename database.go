@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func testTransaction() {
+func createTable() {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./test.db")
 	if err != nil {
@@ -17,7 +17,7 @@ func testTransaction() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "BOOKS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255))`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255))`,
 	)
 	if err != nil {
 		panic(err)
@@ -32,7 +32,7 @@ func insertData() {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO BOOKS (ID, TITLE) VALUES (?, ?)`,
+		`INSERT INTO ANNOTATIONS (ID, TITLE) VALUES (?, ?)`,
 		123,
 		"title",
 	)
@@ -56,7 +56,7 @@ func getLists() {
 	}
 	// 複数レコード取得
 	rows, err := db.Query(
-		`SELECT * FROM BOOKS`,
+		`SELECT * FROM ANNOTATIONS`,
 	)
 	if err != nil {
 		panic(err)
@@ -86,7 +86,7 @@ func getOne(id int) {
 	}
 	// 1件取得
 	row := db.QueryRow(
-		`SELECT * FROM BOOKS WHERE ID=?`,
+		`SELECT * FROM ANNOTATIONS WHERE ID=?`,
 		id,
 	)
 
@@ -113,7 +113,7 @@ func updateData(id int) {
 	}
 	// 更新
 	res, err := db.Exec(
-		`UPDATE BOOKS SET TITLE=? WHERE ID=?`,
+		`UPDATE ANNOTATIONS SET TITLE=? WHERE ID=?`,
 		"update title",
 		id,
 	)
@@ -138,7 +138,7 @@ func deleteData(id int) {
 	}
 	// 削除
 	res, err := db.Exec(
-		`DELETE FROM BOOKS WHERE ID=?`,
+		`DELETE FROM ANNOTATIONS WHERE ID=?`,
 		id,
 	)
 	if err != nil {

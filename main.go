@@ -14,16 +14,16 @@ func main() {
 		port = "8080"
 	}
 
-	testTransaction()
+	createTable()
 	insertData()
 	getLists()
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))
-	router.GET("/events", CommonHeaders(EventIndex, "event-index"))
-	router.GET("/events/:eventId", IDShouldBeInt(EventShow, "event-show"))
-	router.POST("/events", CommonHeaders(EventCreate, "event-create"))
-	router.DELETE("/events/:eventId", IDShouldBeInt(EventDelete, "event-delete"))
+	router.GET("/annotations", CommonHeaders(AnnotationIndex, "annotation-index"))
+	router.GET("/annotations/:annotationId", IDShouldBeInt(AnnotationShow, "annotation-show"))
+	router.POST("/annotations", CommonHeaders(AnnotationCreate, "annotation-create"))
+	router.DELETE("/annotations/:annotationId", IDShouldBeInt(AnnotationDelete, "annotation-delete"))
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

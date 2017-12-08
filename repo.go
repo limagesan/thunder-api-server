@@ -6,40 +6,40 @@ import (
 )
 
 var (
-	events    Events
-	currentID int
+	annotations Annotations
+	currentID   int
 )
 
 func init() {
-	RepoCreateEvent(Event{Title: "中村パーキングYOYOライブ", LocationName: "北浦和Kyara"})
-	RepoCreateEvent(Event{Title: "Freebeeがやっちゃるけえ", LocationName: "北浦和エアーズ"})
+	RepoCreateAnnotation(Annotation{Title: "中村パーキングYOYOライブ", LocationName: "北浦和Kyara"})
+	RepoCreateAnnotation(Annotation{Title: "Freebeeがやっちゃるけえ", LocationName: "北浦和エアーズ"})
 }
 
-func RepoFindEvent(id int) Event {
-	for _, t := range events {
+func RepoFindAnnotation(id int) Annotation {
+	for _, t := range annotations {
 		if t.ID == id {
 			return t
 		}
 	}
-	return Event{}
+	return Annotation{}
 }
 
-func RepoCreateEvent(e Event) Event {
+func RepoCreateAnnotation(e Annotation) Annotation {
 	currentID += 1
 	e.ID = currentID
 	e.CloseTime = time.Now()
 	e.OpenTime = time.Now()
-	events = append(events, e)
+	annotations = append(annotations, e)
 	return e
 }
 
-func RepoDestroyEvent(id int) error {
-	for i, t := range events {
+func RepoDestroyAnnotation(id int) error {
+	for i, t := range annotations {
 		if t.ID == id {
-			events = append(events[:i], events[i+1:]...)
+			annotations = append(annotations[:i], annotations[i+1:]...)
 			return nil
 		}
 	}
 
-	return fmt.Errorf("Could not find Event with id of %d to delete", id)
+	return fmt.Errorf("Could not find Annotation with id of %d to delete", id)
 }

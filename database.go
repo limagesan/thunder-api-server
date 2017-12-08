@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,14 +18,14 @@ func createTable() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255))`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "TOPIMAGEURL1" VARCHAR(255), "TOPIMAGEURL2" VARCHAR(255), "TOPIMAGEURL3" VARCHAR(255), "OPENTIME" VARCHAR(255), "CLOSETIME" VARCHAR(255), "PRICE" INTEGER, "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
 	)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func insertData() {
+func insertData(annotation Annotation) {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./test.db")
 	if err != nil {
@@ -32,9 +33,8 @@ func insertData() {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (ID, TITLE) VALUES (?, ?)`,
-		123,
-		"title",
+		`INSERT INTO ANNOTATIONS (TITLE, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, OPENTIME, CLOSETIME, PRICE, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+		annotation.Title, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.OpenTime, annotation.CloseTime, annotation.Price, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
 		panic(err)
@@ -65,16 +65,24 @@ func getLists() {
 	// 処理が終わったらカーソルを閉じる
 	defer rows.Close()
 	for rows.Next() {
-		var id int
-		var title string
+		var ID int
+		var Title string
+		var TopImageURLs [3]string
+		var OpenTime time.Time
+		var CloseTime time.Time
+		var Price int
+		var SourceURL string
+		var LocationName string
+		var Coordinate Coordinate
 
 		// カーソルから値を取得
-		if err := rows.Scan(&id, &title); err != nil {
+		if err := rows.Scan(&ID, &Title, &TopImageURLs[0], &TopImageURLs[1], &TopImageURLs[2], &OpenTime, &CloseTime, &Price, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
 			log.Fatal("rows.Scan()", err)
 			return
 		}
 
-		fmt.Printf("id: %d, title: %s\n", id, title)
+		fmt.Printf("ID: %d, TopImageURL1: %s, TopImageURL2: %s, TopImageURL3: %s, OpenTime: %s, CloseTime: %s, Price: %d, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], OpenTime, CloseTime, Price, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 	}
 }
 

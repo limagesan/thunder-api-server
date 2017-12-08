@@ -1,1 +1,1 @@
-web: basic-json-api-server
+web: thunder-api-server-go

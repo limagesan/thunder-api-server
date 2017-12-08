@@ -13,6 +13,11 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+
+	testTransaction()
+	insertData()
+	getLists()
+
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))
 	router.GET("/events", CommonHeaders(EventIndex, "event-index"))

@@ -15,8 +15,7 @@ func main() {
 	}
 
 	createTable()
-	insertData()
-	getLists()
+	scraping()
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))

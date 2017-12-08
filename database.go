@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -68,8 +67,8 @@ func getLists() {
 		var ID int
 		var Title string
 		var TopImageURLs [3]string
-		var OpenTime time.Time
-		var CloseTime time.Time
+		var OpenTime []uint8 // Time.timeだとScan時にエラーになる
+		var CloseTime []uint8
 		var Price int
 		var SourceURL string
 		var LocationName string

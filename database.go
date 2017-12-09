@@ -10,7 +10,7 @@ import (
 
 func createTable() {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./thunder.db")
+	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,7 @@ func createTable() {
 
 func insertData(annotation Annotation) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./thunder.db")
+	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -47,9 +47,9 @@ func insertData(annotation Annotation) {
 	fmt.Println("lastInsertId", id)
 }
 
-func getLists() {
+func getLists() Annotations {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./thunder.db")
+	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -60,15 +60,16 @@ func getLists() {
 	if err != nil {
 		panic(err)
 	}
-
+	var annotations Annotations
 	// 処理が終わったらカーソルを閉じる
 	defer rows.Close()
 	for rows.Next() {
+
 		var ID int
 		var Title string
 		var TopImageURLs [3]string
-		var OpenTime []uint8 // Time.timeだとScan時にエラーになる
-		var CloseTime []uint8
+		var OpenTime string // Time.timeだとScan時にエラーになる
+		var CloseTime string
 		var Price int
 		var SourceURL string
 		var LocationName string
@@ -77,17 +78,20 @@ func getLists() {
 		// カーソルから値を取得
 		if err := rows.Scan(&ID, &Title, &TopImageURLs[0], &TopImageURLs[1], &TopImageURLs[2], &OpenTime, &CloseTime, &Price, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
 			log.Fatal("rows.Scan()", err)
-			return
+			return annotations
 		}
+		annotation := NewAnnotation(ID, Title, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], OpenTime, CloseTime, Price, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		annotations = append(annotations, *annotation)
 
-		fmt.Printf("ID: %d, TopImageURL1: %s, TopImageURL2: %s, TopImageURL3: %s, OpenTime: %s, CloseTime: %s, Price: %d, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
-			ID, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], OpenTime, CloseTime, Price, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		fmt.Printf("ID: %d, Title: %s, TopImageURL1: %s, TopImageURL2: %s, TopImageURL3: %s, OpenTime: %s, CloseTime: %s, Price: %d, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, Title, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], OpenTime, CloseTime, Price, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 	}
+	return annotations
 }
 
 func getOne(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./thunder.db")
+	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -114,7 +118,7 @@ func getOne(id int) {
 
 func updateData(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./thunder.db")
+	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +143,7 @@ func updateData(id int) {
 
 func deleteData(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./thunder.db")
+	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {
 		panic(err)
 	}

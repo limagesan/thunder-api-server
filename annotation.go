@@ -1,13 +1,11 @@
 package main
 
-import "time"
-
 type Annotation struct {
 	ID           int        `json:"id"`
 	Title        string     `json:"title"`
 	TopImageURLs [3]string  `json:"topImageURLs"`
-	OpenTime     time.Time  `json:"openTime"`
-	CloseTime    time.Time  `json:"closeTime"`
+	OpenTime     string     `json:"openTime"`
+	CloseTime    string     `json:"closeTime"`
 	Price        int        `json:"price"`
 	SourceURL    string     `json:"sourceURL"`
 	LocationName string     `json:"locationName"`
@@ -21,8 +19,9 @@ type Coordinate struct {
 
 type Annotations []Annotation
 
-func NewAnnotation(Title string, TopImageURL1 string, TopImageURL2 string, TopImageURL3 string, OpenTime time.Time, CloseTime time.Time, Price int, SourceURL string, LocationName string, Latitude float64, Longitude float64) *Annotation {
+func NewAnnotation(ID int, Title string, TopImageURL1 string, TopImageURL2 string, TopImageURL3 string, OpenTime string, CloseTime string, Price int, SourceURL string, LocationName string, Latitude float64, Longitude float64) *Annotation {
 	p := new(Annotation)
+	p.ID = ID
 	p.Title = Title
 	p.TopImageURLs[0] = TopImageURL1
 	p.TopImageURLs[1] = TopImageURL2

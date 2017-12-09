@@ -24,11 +24,17 @@ func RepoFindAnnotation(id int) Annotation {
 	return Annotation{}
 }
 
+func RepoUpdateAnnotations(arrays Annotations) {
+	annotations = arrays
+}
+
 func RepoCreateAnnotation(e Annotation) Annotation {
 	currentID += 1
 	e.ID = currentID
-	e.CloseTime = time.Now()
-	e.OpenTime = time.Now()
+	_openTime := time.Now()
+	_closeTime := time.Now()
+	e.CloseTime = _openTime.String()
+	e.OpenTime = _closeTime.String()
 	annotations = append(annotations, e)
 	return e
 }

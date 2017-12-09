@@ -28,7 +28,7 @@ then
   # echo "max num is ${max}"
   indexNum=`expr $max + 1`
   fileName="thunder${indexNum}.db"
-  if thunder -e "./database/thunder.db"
+  if test -e "./database/thunder.db"
   then
     mv ./database/thunder.db ./database/$fileName
     echo "SUCCESS: move thunder.db to ${fileName}"

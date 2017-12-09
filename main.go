@@ -15,7 +15,9 @@ func main() {
 	}
 
 	createTable()
-	scraping()
+	insertTestData()
+	annotations := getLists()
+	RepoUpdateAnnotations(annotations)
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))

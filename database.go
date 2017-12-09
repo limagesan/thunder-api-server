@@ -10,7 +10,7 @@ import (
 
 func createTable() {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,7 @@ func createTable() {
 
 func insertData(annotation Annotation) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +49,7 @@ func insertData(annotation Annotation) {
 
 func getLists() {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +87,7 @@ func getLists() {
 
 func getOne(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -114,7 +114,7 @@ func getOne(id int) {
 
 func updateData(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +139,7 @@ func updateData(id int) {
 
 func deleteData(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./thunder.db")
 	if err != nil {
 		panic(err)
 	}

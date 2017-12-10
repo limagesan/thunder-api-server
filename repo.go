@@ -31,10 +31,10 @@ func RepoUpdateAnnotations(arrays Annotations) {
 func RepoCreateAnnotation(e Annotation) Annotation {
 	currentID += 1
 	e.ID = currentID
-	_openTime := time.Now()
-	_closeTime := time.Now()
-	e.CloseTime = _openTime.String()
-	e.OpenTime = _closeTime.String()
+	_startTime := time.Now()
+	_endTime := time.Now()
+	e.EndTime = _startTime.String()
+	e.StartTime = _endTime.String()
 	annotations = append(annotations, e)
 	return e
 }

@@ -17,7 +17,7 @@ func createTable() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "TOPIMAGEURL1" VARCHAR(255), "TOPIMAGEURL2" VARCHAR(255), "TOPIMAGEURL3" VARCHAR(255), "OPENTIME" VARCHAR(255), "CLOSETIME" VARCHAR(255), "PRICE" INTEGER, "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"TOPIMAGEURL1" VARCHAR(255), "TOPIMAGEURL2" VARCHAR(255), "TOPIMAGEURL3" VARCHAR(255), "OPENTIME" VARCHAR(255), "CLOSETIME" VARCHAR(255), "PRICE" INTEGER, "PRICETEXT" VARCHAR(255), "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
 	)
 	if err != nil {
 		panic(err)
@@ -32,8 +32,8 @@ func insertData(annotation Annotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (TITLE, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, OPENTIME, CLOSETIME, PRICE, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
-		annotation.Title, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.OpenTime, annotation.CloseTime, annotation.Price, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
+		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, OPENTIME, CLOSETIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		annotation.Title, annotation.Artists, annotation.Description, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
 		panic(err)
@@ -67,24 +67,27 @@ func getLists() Annotations {
 
 		var ID int
 		var Title string
+		var Artists string
+		var Description string
 		var TopImageURLs [3]string
-		var OpenTime string // Time.timeだとScan時にエラーになる
-		var CloseTime string
+		var StartTime string // Time.timeだとScan時にエラーになる
+		var EndTime string
 		var Price int
+		var PriceText string
 		var SourceURL string
 		var LocationName string
 		var Coordinate Coordinate
 
 		// カーソルから値を取得
-		if err := rows.Scan(&ID, &Title, &TopImageURLs[0], &TopImageURLs[1], &TopImageURLs[2], &OpenTime, &CloseTime, &Price, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+		if err := rows.Scan(&ID, &Title, &Artists, &Description, &TopImageURLs[0], &TopImageURLs[1], &TopImageURLs[2], &StartTime, &EndTime, &Price, &PriceText, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
 			log.Fatal("rows.Scan()", err)
 			return annotations
 		}
-		annotation := NewAnnotation(ID, Title, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], OpenTime, CloseTime, Price, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		annotation := NewAnnotation(ID, Title, Artists, Description, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 		annotations = append(annotations, *annotation)
 
-		fmt.Printf("ID: %d, Title: %s, TopImageURL1: %s, TopImageURL2: %s, TopImageURL3: %s, OpenTime: %s, CloseTime: %s, Price: %d, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
-			ID, Title, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], OpenTime, CloseTime, Price, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Description: %s, TopImageURL1: %s, TopImageURL2: %s, TopImageURL3: %s, StartTime: %s, EndTime: %s, Price: %d, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, Title, Artists, Description, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 	}
 	return annotations
 }

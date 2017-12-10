@@ -14,8 +14,9 @@ func main() {
 		port = "8080"
 	}
 
+	// scraping()
 	createTable()
-	insertTestData()
+	// insertTestData()
 	annotations := getLists()
 	RepoUpdateAnnotations(annotations)
 

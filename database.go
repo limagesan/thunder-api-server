@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,7 +18,7 @@ func createTable() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"TOPIMAGEURL1" VARCHAR(255), "TOPIMAGEURL2" VARCHAR(255), "TOPIMAGEURL3" VARCHAR(255), "OPENTIME" VARCHAR(255), "CLOSETIME" VARCHAR(255), "PRICE" INTEGER, "PRICETEXT" VARCHAR(255), "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"TOPIMAGEURL1" VARCHAR(255), "TOPIMAGEURL2" VARCHAR(255), "TOPIMAGEURL3" VARCHAR(255), "STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "PRICE" INTEGER, "PRICETEXT" VARCHAR(255), "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
 	)
 	if err != nil {
 		panic(err)
@@ -32,7 +33,7 @@ func insertData(annotation Annotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, OPENTIME, CLOSETIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
 		annotation.Title, annotation.Artists, annotation.Description, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
@@ -53,9 +54,14 @@ func getLists() Annotations {
 	if err != nil {
 		panic(err)
 	}
+	now := time.Now()
+	afterTwoDays := now.Add(48 * time.Hour)
+
 	// 複数レコード取得
 	rows, err := db.Query(
-		`SELECT * FROM ANNOTATIONS`,
+		`SELECT * FROM ANNOTATIONS WHERE ? < STARTTIME AND STARTTIME < ? ORDER BY	STARTTIME`,
+		now.String(),
+		afterTwoDays.String(),
 	)
 	if err != nil {
 		panic(err)

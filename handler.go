@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -18,6 +19,18 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func AnnotationIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
+
+	/* EndTimeを過ぎたアノテーションはキャッシュから消す */
+	var _annotations Annotations
+	for i := 0; i < len(annotations); i++ {
+		t, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", annotations[i].EndTime)
+		now := time.Now()
+		now = now.Add(5 * time.Hour)
+		if t.Sub(now) > 0 {
+			_annotations = append(_annotations, annotations[i])
+		}
+	}
+	annotations = _annotations
 
 	if err := json.NewEncoder(w).Encode(annotations); err != nil {
 		panic(err)

@@ -9,6 +9,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const CACHEDATE = 5
+
 func createTable() {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/thunder.db")
@@ -55,7 +57,7 @@ func getLists() Annotations {
 		panic(err)
 	}
 	now := time.Now()
-	afterTwoDays := now.Add(48 * time.Hour)
+	afterTwoDays := now.Add(CACHEDATE * 24 * time.Hour)
 
 	// 複数レコード取得
 	rows, err := db.Query(

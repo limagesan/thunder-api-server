@@ -25,7 +25,6 @@ func AnnotationIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 	for i := 0; i < len(annotations); i++ {
 		t, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", annotations[i].EndTime)
 		now := time.Now()
-		now = now.Add(5 * time.Hour)
 		if t.Sub(now) > 0 {
 			_annotations = append(_annotations, annotations[i])
 		}

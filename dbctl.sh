@@ -35,6 +35,12 @@ then
   else
     echo "EXCEPTION: ./database/thunder.db is not found"
   fi
+
+elif [ "$1" == "cp" ]
+then
+  cp ../scraper-thunder/database/thunder.db ./database/
+  echo "SUCCESS: copy from scraper-thunder"
+  ls database
 else 
   echo "unknown command is called"
 fi

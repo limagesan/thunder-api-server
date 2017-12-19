@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -36,7 +37,7 @@ func insertData(annotation Annotation) {
 	// データの挿入
 	res, err := db.Exec(
 		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, VIDEOID, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-		annotation.Title, annotation.Artists, annotation.Description, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.VideoId, annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
+		annotation.Title, sliceToString(annotation.Artists), annotation.Description, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.VideoId, annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
 		panic(err)
@@ -92,7 +93,7 @@ func getLists() Annotations {
 			log.Fatal("rows.Scan()", err)
 			return annotations
 		}
-		annotation := NewAnnotation(ID, Title, Artists, Description, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], VideoId, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), Description, TopImageURLs[0], TopImageURLs[1], TopImageURLs[2], VideoId, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 
 		annotations = append(annotations, *annotation)
 
@@ -176,4 +177,24 @@ func deleteData(id int) {
 	}
 
 	fmt.Printf("affected by delete: %d\n", affect)
+}
+
+func sliceToString(sli []string) string {
+	var S string = ""
+	for i := 0; i < len(sli); i++ {
+		var comma string
+		if i == len(sli)-1 {
+			comma = ""
+		} else {
+			comma = ","
+		}
+		S = S + sli[i] + comma
+	}
+	return S
+}
+
+func stringToSlice(str string) []string {
+	rep := regexp.MustCompile(`\s*,\s*`)
+	sep := rep.Split(str, -1)
+	return sep
 }

@@ -4,6 +4,7 @@ type Annotation struct {
 	ID           int        `json:"id"`
 	Title        string     `json:"title"`
 	Artists      []string   `json:"artists"`
+	Tags         []string   `json:"tags"`
 	Description  string     `json:"description"`
 	TopImageURLs [3]string  `json:"topImageURLs"`
 	VideoId      string     `json:"videoId"`
@@ -23,11 +24,12 @@ type Coordinate struct {
 
 type Annotations []Annotation
 
-func NewAnnotation(ID int, Title string, Artists []string, Description string, TopImageURL1 string, TopImageURL2 string, TopImageURL3 string, VideoId string, StartTime string, EndTime string, Price int, PriceText string, SourceURL string, LocationName string, Latitude float64, Longitude float64) *Annotation {
+func NewAnnotation(ID int, Title string, Artists []string, Tags []string, Description string, TopImageURL1 string, TopImageURL2 string, TopImageURL3 string, VideoId string, StartTime string, EndTime string, Price int, PriceText string, SourceURL string, LocationName string, Latitude float64, Longitude float64) *Annotation {
 	p := new(Annotation)
 	p.ID = ID
 	p.Title = Title
 	p.Artists = Artists
+	p.Tags = Tags
 	p.Description = Description
 	p.TopImageURLs[0] = TopImageURL1
 	p.TopImageURLs[1] = TopImageURL2

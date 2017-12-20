@@ -36,7 +36,7 @@ func insertData(annotation Annotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, TAGS, DESCRIPTION, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, VIDEOID, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, TAGS, DESCRIPTION, TOPIMAGEURL1, TOPIMAGEURL2, TOPIMAGEURL3, VIDEOID, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
 		annotation.Title, sliceToString(annotation.Artists), sliceToString(annotation.Tags), annotation.Description, annotation.TopImageURLs[0], annotation.TopImageURLs[1], annotation.TopImageURLs[2], annotation.VideoId, annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {

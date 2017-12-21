@@ -1,21 +1,21 @@
 package main
 
 type Annotation struct {
-	ID              int        `json:"id"`
-	Title           string     `json:"title"`
-	Artists         []string   `json:"artists"`
-	Tags            []string   `json:"tags"`
-	Description     string     `json:"description"`
-	ArtistImageURLs []string   `json:"artistImageURLs"`
-	PlaceImageURLs  []string   `json:"placeImageURLs"`
-	VideoIds        []string   `json:"videoIds"`
-	StartTime       string     `json:"startTime"`
-	EndTime         string     `json:"endTime"`
-	Price           int        `json:"price"`
-	PriceText       string     `json:"priceText"`
-	SourceURL       string     `json:"sourceURL"`
-	LocationName    string     `json:"locationName"`
-	Coordinate      Coordinate `json:"coordinate"`
+	ID                int        `json:"id"`
+	Title             string     `json:"title"`
+	Artists           []string   `json:"artists"`
+	Tags              []string   `json:"tags"`
+	Description       string     `json:"description"`
+	ArtistImageURLs   []string   `json:"artistImageURLs"`
+	LocationImageURLs []string   `json:"locationImageURLs"`
+	VideoIds          []string   `json:"videoIds"`
+	StartTime         string     `json:"startTime"`
+	EndTime           string     `json:"endTime"`
+	Price             int        `json:"price"`
+	PriceText         string     `json:"priceText"`
+	SourceURL         string     `json:"sourceURL"`
+	LocationName      string     `json:"locationName"`
+	Coordinate        Coordinate `json:"coordinate"`
 }
 
 type Coordinate struct {
@@ -25,7 +25,7 @@ type Coordinate struct {
 
 type Annotations []Annotation
 
-func NewAnnotation(ID int, Title string, Artists []string, Tags []string, Description string, ArtistImageURLs []string, PlaceImageURLs []string, VideoIds []string, StartTime string, EndTime string, Price int, PriceText string, SourceURL string, LocationName string, Latitude float64, Longitude float64) *Annotation {
+func NewAnnotation(ID int, Title string, Artists []string, Tags []string, Description string, ArtistImageURLs []string, LocationImageURLs []string, VideoIds []string, StartTime string, EndTime string, Price int, PriceText string, SourceURL string, LocationName string, Latitude float64, Longitude float64) *Annotation {
 	p := new(Annotation)
 	p.ID = ID
 	p.Title = Title
@@ -33,7 +33,7 @@ func NewAnnotation(ID int, Title string, Artists []string, Tags []string, Descri
 	p.Tags = Tags
 	p.Description = Description
 	p.ArtistImageURLs = ArtistImageURLs
-	p.PlaceImageURLs = PlaceImageURLs
+	p.LocationImageURLs = LocationImageURLs
 	p.VideoIds = VideoIds
 	p.StartTime = StartTime
 	p.EndTime = EndTime

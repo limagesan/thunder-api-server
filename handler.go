@@ -86,6 +86,55 @@ func AnnotationDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	w.WriteHeader(204) // 204 No Content
 }
 
+func TransAnnotationIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
+
+	transAnnotations := getTransAnnotations()
+	if err := json.NewEncoder(w).Encode(transAnnotations); err != nil {
+		panic(err)
+	}
+}
+
+func TransAnnotationShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("annotationId"))
+	t := getTransAnnotation(id)
+	if t.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		panic(err)
+	}
+}
+
+func TransAnnotationUpdate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var transAnnotation TransAnnotation
+	print("CALLTRANSUPDATE")
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	id, _ := strconv.Atoi(ps.ByName("annotationId"))
+	if err != nil {
+		panic(err)
+	}
+	defer r.Body.Close()
+	transAnnotation.ID = id
+	if err := json.Unmarshal(body, &transAnnotation); err != nil {
+		w.WriteHeader(500)
+		fmt.Println("CHECK", transAnnotation)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+		return
+	}
+	fmt.Println("CHECKOK")
+	t := updateTransAnnotation(id, transAnnotation)
+	location := fmt.Sprintf("http://%s/%d", r.Host, id)
+	w.Header().Set("Location", location)
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		panic(err)
+	}
+}
+
 func TagIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
 

@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func updateTransAnnotationsDB() {
+func updateTransAnnotationsDB(annotations Annotations) {
 	var willDeleteIds []int
 	var willAddIds []int
 	transAnnotations := getTransAnnotations()
@@ -20,7 +20,7 @@ func updateTransAnnotationsDB() {
 				isFound = true
 			}
 		}
-		if !isFound {
+		if isFound == false {
 			willAddIds = append(willAddIds, annotations[i].ID)
 		}
 	}
@@ -38,7 +38,7 @@ func updateTransAnnotationsDB() {
 	}
 
 	for i := 0; i < len(willAddIds); i++ {
-		var tagIds []string
+		var tagIds []int
 
 		annotation := NewTransAnnotation(willAddIds[i], tagIds, 0)
 		insertTransAnnotation(*annotation)
@@ -47,7 +47,6 @@ func updateTransAnnotationsDB() {
 	for i := 0; i < len(willDeleteIds); i++ {
 		deleteTransAnnotation(willDeleteIds[i])
 	}
-
 }
 
 func createTransAnnotationTable() {
@@ -59,7 +58,7 @@ func createTransAnnotationTable() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "TRANSANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TAGIDS" VARCHAR(255), "NICENUM" INTEGER)`,
+		`CREATE TABLE IF NOT EXISTS "TRANSANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TAGIDS" INTEGER, "NICENUM" INTEGER)`,
 	)
 	if err != nil {
 		panic(err)
@@ -74,8 +73,8 @@ func insertTransAnnotation(transAnnotation TransAnnotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (ID, TAGIDS, NICENUM) VALUES (?,?,?)`,
-		transAnnotation.ID, sliceToString(transAnnotation.TagIds), transAnnotation.NiceNum)
+		`INSERT INTO TRANSANNOTATIONS (ID, TAGIDS, NICENUM) VALUES (?,?,?)`,
+		transAnnotation.ID, intSliceToString(transAnnotation.TagIds), transAnnotation.NiceNum)
 	if err != nil {
 		panic(err)
 	}
@@ -114,7 +113,7 @@ func getTransAnnotations() TransAnnotations {
 			log.Fatal("rows.Scan()", err)
 			return transAnnotations
 		}
-		transAnnotation := NewTransAnnotation(ID, stringToSlice(TagIds), NiceNum)
+		transAnnotation := NewTransAnnotation(ID, stringToIntSlice(TagIds), NiceNum)
 		transAnnotations = append(transAnnotations, *transAnnotation)
 
 		fmt.Printf("ID: %d, TagIds: %s, NiceNum: %d", ID, TagIds, NiceNum)
@@ -130,7 +129,7 @@ func getTransAnnotation(id int) TransAnnotation {
 	}
 	// 1件取得
 	row := db.QueryRow(
-		`SELECT * FROM ANNOTATIONS WHERE ID=?`,
+		`SELECT * FROM TRANSANNOTATIONS WHERE ID=?`,
 		id,
 	)
 
@@ -149,20 +148,22 @@ func getTransAnnotation(id int) TransAnnotation {
 		fmt.Printf("id: %d, tagIds: %s, niceNum: %d\n", id2, tagIds, niceNum)
 	}
 
-	transAnnotation := NewTransAnnotation(id2, stringToSlice(tagIds), niceNum)
+	transAnnotation := NewTransAnnotation(id2, stringToIntSlice(tagIds), niceNum)
 	return *transAnnotation
 }
 
-func updateTransAnnotation(id int, transAnnotation TransAnnotation) {
+func updateTransAnnotation(id int, transAnnotation TransAnnotation) TransAnnotation {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
 	// 更新
+	transAnnotation.ID = id
+
 	res, err := db.Exec(
-		`UPDATE ANNOTATIONS SET TAGIDS=?,NICENUM=? WHERE ID=?`,
-		sliceToString(transAnnotation.TagIds),
+		`UPDATE TRANSANNOTATIONS SET TAGIDS=?,NICENUM=? WHERE ID=?`,
+		intSliceToString(transAnnotation.TagIds),
 		transAnnotation.NiceNum,
 		id)
 	if err != nil {
@@ -176,6 +177,7 @@ func updateTransAnnotation(id int, transAnnotation TransAnnotation) {
 	}
 
 	fmt.Printf("affected by update: %d\n", affect)
+	return transAnnotation
 }
 
 func deleteTransAnnotation(id int) {
@@ -186,7 +188,7 @@ func deleteTransAnnotation(id int) {
 	}
 	// 削除
 	res, err := db.Exec(
-		`DELETE FROM ANNOTATIONS WHERE ID=?`,
+		`DELETE FROM TRANSANNOTATIONS WHERE ID=?`,
 		id,
 	)
 	if err != nil {

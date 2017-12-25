@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -199,4 +200,32 @@ func stringToSlice(str string) []string {
 	rep := regexp.MustCompile(`\s*,\s*`)
 	sep := rep.Split(str, -1)
 	return sep
+}
+
+func intSliceToString(sli []int) string {
+	var S string = ""
+	for i := 0; i < len(sli); i++ {
+		var comma string
+		if i == len(sli)-1 {
+			comma = ""
+		} else {
+			comma = ","
+		}
+		el := strconv.Itoa(sli[i])
+		S = S + el + comma
+	}
+	return S
+}
+
+func stringToIntSlice(str string) []int {
+	rep := regexp.MustCompile(`\s*,\s*`)
+	sep := rep.Split(str, -1)
+	var res []int
+	for i := 0; i < len(sep); i++ {
+		el, err := strconv.Atoi(sep[i])
+		if err == nil {
+			res = append(res, el)
+		}
+	}
+	return res
 }

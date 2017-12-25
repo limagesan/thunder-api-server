@@ -16,10 +16,12 @@ func main() {
 
 	// scraping()
 	createAnnotationTable()
+	createTransAnnotationTable()
 	createTagTable()
 
 	// insertTestData()
 	annotations := getAnnotations()
+	updateTransAnnotationsDB(annotations)
 	RepoUpdateAnnotations(annotations)
 
 	router := httprouter.New()
@@ -28,6 +30,10 @@ func main() {
 	router.GET("/annotations/:annotationId", IDShouldBeInt(AnnotationShow, "annotation-show", "annotationId"))
 	router.POST("/annotations", CommonHeaders(AnnotationCreate, "annotation-create"))
 	router.DELETE("/annotations/:annotationId", IDShouldBeInt(AnnotationDelete, "annotation-delete", "annotationId"))
+
+	router.GET("/trans/annotations", CommonHeaders(TransAnnotationIndex, "trans-annotation-index"))
+	router.GET("/trans/annotations/:annotationId", IDShouldBeInt(TransAnnotationShow, "trans-annotation-show", "annotationId"))
+	router.PUT("/trans/annotations/:annotationId", IDShouldBeInt(TransAnnotationUpdate, "trans-annotation-update", "annotationId"))
 
 	router.GET("/tags", CommonHeaders(TagIndex, "tag-index"))
 	router.POST("/tags", CommonHeaders(TagCreate, "tag-create"))

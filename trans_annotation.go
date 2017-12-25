@@ -15,3 +15,19 @@ func NewTransAnnotation(ID int, TagIds []string, NiceNum int) *TransAnnotation {
 	p.NiceNum = NiceNum
 	return p
 }
+
+type Tag struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+type Tags []Tag
+
+func NewTag(ID int, Name string, Color string) *Tag {
+	p := new(Tag)
+	p.ID = ID
+	p.Name = Name
+	p.Color = Color
+	return p
+}

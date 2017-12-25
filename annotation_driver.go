@@ -12,7 +12,7 @@ import (
 
 const CACHEDATE = 5
 
-func createTable() {
+func createAnnotationTable() {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/thunder.db")
 	if err != nil {

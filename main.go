@@ -15,7 +15,7 @@ func main() {
 	}
 
 	// scraping()
-	createTable()
+	createAnnotationTable()
 	// insertTestData()
 	annotations := getAnnotations()
 	RepoUpdateAnnotations(annotations)

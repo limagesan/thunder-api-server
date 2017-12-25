@@ -17,7 +17,7 @@ func main() {
 	// scraping()
 	createTable()
 	// insertTestData()
-	annotations := getLists()
+	annotations := getAnnotations()
 	RepoUpdateAnnotations(annotations)
 
 	router := httprouter.New()

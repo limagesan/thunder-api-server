@@ -74,7 +74,7 @@ func insertTransAnnotation(transAnnotation TransAnnotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (ID, TAGIDS, NICENUM VALUES (?,?,?)`,
+		`INSERT INTO ANNOTATIONS (ID, TAGIDS, NICENUM) VALUES (?,?,?)`,
 		transAnnotation.ID, sliceToString(transAnnotation.TagIds), transAnnotation.NiceNum)
 	if err != nil {
 		panic(err)

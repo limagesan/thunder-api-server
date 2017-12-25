@@ -8,9 +8,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func IDShouldBeInt(h httprouter.Handle, name string) httprouter.Handle {
+func IDShouldBeInt(h httprouter.Handle, name string, idName string) httprouter.Handle {
 	return CommonHeaders(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		idParam := ps.ByName("annotationId")
+		idParam := ps.ByName(idName)
 		_, err := strconv.Atoi(idParam)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")

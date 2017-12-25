@@ -24,14 +24,14 @@ func createTagTable() {
 	}
 }
 
-func insertTag(tag Tag) {
+func insertTag(tag Tag) int {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
 	// データの挿入
-	res, err := db.Exec(`INSERT INTO TAGS (NAME, COLOR VALUES (?,?)`, tag.Name, tag.Color)
+	res, err := db.Exec(`INSERT INTO TAGS (NAME, COLOR) VALUES (?,?)`, tag.Name, tag.Color)
 	if err != nil {
 		panic(err)
 	}
@@ -42,6 +42,7 @@ func insertTag(tag Tag) {
 		panic(err)
 	}
 	fmt.Println("lastInsertId", id)
+	return int(id)
 }
 
 func getTags() Tags {
@@ -76,31 +77,6 @@ func getTags() Tags {
 		fmt.Printf("ID: %d, Name: %s, Color: %s", ID, Name, Color)
 	}
 	return tags
-}
-
-func updateTransAnnotation(id int, tag Tag) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// 更新
-	res, err := db.Exec(
-		`UPDATE TAGS SET NAME=?,COLOR=? WHERE ID=?`,
-		tag.Name,
-		tag.Color,
-		id)
-	if err != nil {
-		panic(err)
-	}
-
-	// 更新されたレコード数
-	affect, err := res.RowsAffected()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("affected by update: %d\n", affect)
 }
 
 func deleteTag(id int) {

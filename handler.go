@@ -85,3 +85,49 @@ func AnnotationDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	w.Header().Del("Content-Type")
 	w.WriteHeader(204) // 204 No Content
 }
+
+func TagIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
+
+	tags := getTags()
+	if err := json.NewEncoder(w).Encode(tags); err != nil {
+		panic(err)
+	}
+}
+
+func TagCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var tag Tag
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+
+	if err != nil {
+		panic(err)
+	}
+	defer r.Body.Close()
+
+	if err := json.Unmarshal(body, &tag); err != nil {
+		w.WriteHeader(500)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	createdId := insertTag(tag)
+	tag.ID = createdId
+	location := fmt.Sprintf("http://%s/%d", r.Host, createdId)
+	w.Header().Set("Location", location)
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(tag); err != nil {
+		panic(err)
+	}
+}
+
+func TagDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("tagId"))
+
+	deleteTag(id)
+
+	w.Header().Del("Content-Type")
+	w.WriteHeader(204) // 204 No Content
+}

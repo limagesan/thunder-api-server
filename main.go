@@ -39,5 +39,8 @@ func main() {
 	router.POST("/tags", CommonHeaders(TagCreate, "tag-create"))
 	router.DELETE("/tags/:tagId", IDShouldBeInt(TagDelete, "tag-delete", "tagId"))
 
+	router.POST("/trans/annotations/:annotationId/niceNum/increment", IDShouldBeInt(IncrementNiceNum, "increment-niceNum", "annotationId"))
+	router.POST("/trans/annotations/:annotationId/niceNum/decrement", IDShouldBeInt(DecrementNiceNum, "decrement-niceNum", "annotationId"))
+
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

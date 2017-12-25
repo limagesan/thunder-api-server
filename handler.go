@@ -109,7 +109,7 @@ func TransAnnotationShow(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 func TransAnnotationUpdate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var transAnnotation TransAnnotation
-	print("CALLTRANSUPDATE")
+
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	id, _ := strconv.Atoi(ps.ByName("annotationId"))
 	if err != nil {
@@ -119,18 +119,21 @@ func TransAnnotationUpdate(w http.ResponseWriter, r *http.Request, ps httprouter
 	transAnnotation.ID = id
 	if err := json.Unmarshal(body, &transAnnotation); err != nil {
 		w.WriteHeader(500)
-		fmt.Println("CHECK", transAnnotation)
+		// fmt.Println("CHECK", transAnnotation)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
 		}
 		return
 	}
-	fmt.Println("CHECKOK")
-	t := updateTransAnnotation(id, transAnnotation)
+	type ResSchema struct {
+		TagIds []int `json:"tagIds"`
+	}
+	tagIds := updateTransAnnotation(id, transAnnotation)
+	resBody := ResSchema{tagIds}
 	location := fmt.Sprintf("http://%s/%d", r.Host, id)
 	w.Header().Set("Location", location)
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
+	if err := json.NewEncoder(w).Encode(resBody); err != nil {
 		panic(err)
 	}
 }
@@ -179,4 +182,24 @@ func TagDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	w.Header().Del("Content-Type")
 	w.WriteHeader(204) // 204 No Content
+}
+
+func IncrementNiceNum(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("annotationId"))
+
+	transAnnotation := incrementNiceNum(id)
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(transAnnotation); err != nil {
+		panic(err)
+	}
+}
+
+func DecrementNiceNum(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("annotationId"))
+
+	transAnnotation := decrementNiceNum(id)
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(transAnnotation); err != nil {
+		panic(err)
+	}
 }

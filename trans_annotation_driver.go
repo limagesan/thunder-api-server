@@ -152,19 +152,17 @@ func getTransAnnotation(id int) TransAnnotation {
 	return *transAnnotation
 }
 
-func updateTransAnnotation(id int, transAnnotation TransAnnotation) TransAnnotation {
+func updateTransAnnotation(id int, transAnnotation TransAnnotation) []int {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
 	// 更新
-	transAnnotation.ID = id
 
 	res, err := db.Exec(
-		`UPDATE TRANSANNOTATIONS SET TAGIDS=?,NICENUM=? WHERE ID=?`,
+		`UPDATE TRANSANNOTATIONS SET TAGIDS=? WHERE ID=?`,
 		intSliceToString(transAnnotation.TagIds),
-		transAnnotation.NiceNum,
 		id)
 	if err != nil {
 		panic(err)
@@ -177,7 +175,7 @@ func updateTransAnnotation(id int, transAnnotation TransAnnotation) TransAnnotat
 	}
 
 	fmt.Printf("affected by update: %d\n", affect)
-	return transAnnotation
+	return transAnnotation.TagIds
 }
 
 func deleteTransAnnotation(id int) {
@@ -202,4 +200,62 @@ func deleteTransAnnotation(id int) {
 	}
 
 	fmt.Printf("affected by delete: %d\n", affect)
+}
+
+func incrementNiceNum(id int) TransAnnotation {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	if err != nil {
+		panic(err)
+	}
+	// 更新
+	currentAnnotation := getTransAnnotation(id)
+	currentAnnotation.NiceNum = currentAnnotation.NiceNum + 1
+
+	res, err := db.Exec(
+		`UPDATE TRANSANNOTATIONS SET NICENUM=? WHERE ID=?`,
+		currentAnnotation.NiceNum,
+		id)
+	if err != nil {
+		panic(err)
+	}
+
+	// 更新されたレコード数
+	affect, err := res.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("affected by update: %d\n", affect)
+	return currentAnnotation
+}
+
+func decrementNiceNum(id int) TransAnnotation {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	if err != nil {
+		panic(err)
+	}
+	// 更新
+	currentAnnotation := getTransAnnotation(id)
+	if currentAnnotation.NiceNum > 0 {
+		currentAnnotation.NiceNum = currentAnnotation.NiceNum - 1
+	}
+
+	res, err := db.Exec(
+		`UPDATE TRANSANNOTATIONS SET NICENUM=? WHERE ID=?`,
+		currentAnnotation.NiceNum,
+		id)
+	if err != nil {
+		panic(err)
+	}
+
+	// 更新されたレコード数
+	affect, err := res.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("affected by update: %d\n", affect)
+	return currentAnnotation
 }

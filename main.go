@@ -14,11 +14,27 @@ func main() {
 		port = "8080"
 	}
 
+	// db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// // 削除
+	// _, err = db.Exec(
+	// 	`DROP TABLE ANNOTATIONS`,
+	// )
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// return
+
 	// scraping()
 	createAnnotationTable()
 	createTransAnnotationTable()
 	createTagTable()
 
+	removeAllAnnotations()
+	copyAnnotations()
 	// insertTestData()
 	annotations := getAnnotations()
 	updateTransAnnotationsDB(annotations)

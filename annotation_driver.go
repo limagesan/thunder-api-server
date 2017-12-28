@@ -13,16 +13,87 @@ import (
 
 const CACHEDATE = 5
 
-func createAnnotationTable() {
+func removeAllAnnotations() {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	if err != nil {
+		panic(err)
+	}
+	// データの挿入
+	_, err = db.Exec(`DELETE FROM ANNOTATIONS`)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func copyAnnotations() {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	if err != nil {
+		panic(err)
+	}
+	now := time.Now()
+	afterTwoDays := now.Add(CACHEDATE * 24 * time.Hour)
+
+	// 複数レコード取得
+	rows, err := db.Query(
+		`SELECT * FROM ANNOTATIONS`,
+		now.String(),
+		afterTwoDays.String(),
+	)
+	if err != nil {
+		panic(err)
+	}
+	var _annotations Annotations
+	// 処理が終わったらカーソルを閉じる
+	defer rows.Close()
+	for rows.Next() {
+
+		var ID int
+		var Title string
+		var Artists string
+		var Tags string
+		var Description string
+		var ArtistImageURLs string
+		var LocationImageURLs string
+		var VideoIds string
+		var StartTime string // Time.timeだとScan時にエラーになる
+		var EndTime string
+		var Price int
+		var PriceText string
+		var SourceURL string
+		var LocationName string
+		var Coordinate Coordinate
+
+		// カーソルから値を取得
+		if err := rows.Scan(&ID, &Title, &Artists, &Tags, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &Price, &PriceText, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+			log.Fatal("rows.Scan()", err)
+		}
+		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), stringToSlice(Tags), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+
+		_annotations = append(_annotations, *annotation)
+
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Tags: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, Price: %d, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, Title, Artists, Tags, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+
+	}
+
+	fmt.Println("checkAnnotations", _annotations)
+	for i := 0; i < len(_annotations); i++ {
+		insertAnnotation(_annotations[i])
+	}
+}
+
+func createAnnotationTable() {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "TAGS" VARCHAR(255),"DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "PRICE" INTEGER, "PRICETEXT" VARCHAR(255), "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "TAGS" VARCHAR(255),"DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "PRICE" INTEGER, "PRICETEXT" VARCHAR(255), "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
 	)
 	if err != nil {
 		panic(err)
@@ -31,14 +102,14 @@ func createAnnotationTable() {
 
 func insertAnnotation(annotation Annotation) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, TAGS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-		annotation.Title, sliceToString(annotation.Artists), sliceToString(annotation.Tags), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
+		`INSERT INTO ANNOTATIONS (ID, TITLE, ARTISTS, TAGS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		annotation.ID, annotation.Title, sliceToString(annotation.Artists), sliceToString(annotation.Tags), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
 		panic(err)
@@ -54,7 +125,7 @@ func insertAnnotation(annotation Annotation) {
 
 func getAnnotations() Annotations {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -108,7 +179,7 @@ func getAnnotations() Annotations {
 
 func getAnnotation(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +206,7 @@ func getAnnotation(id int) {
 
 func updateAnnotation(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
@@ -160,7 +231,7 @@ func updateAnnotation(id int) {
 
 func deleteAnnotation(id int) {
 	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}

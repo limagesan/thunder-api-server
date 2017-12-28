@@ -203,3 +203,16 @@ func DecrementNiceNum(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		panic(err)
 	}
 }
+
+func Ranking(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
+
+	/* EndTimeを過ぎたアノテーションはキャッシュから消す */
+	var _fullAnnotations FullAnnotations
+
+	_fullAnnotations = getRanking()
+
+	if err := json.NewEncoder(w).Encode(_fullAnnotations); err != nil {
+		panic(err)
+	}
+}

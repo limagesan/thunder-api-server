@@ -300,3 +300,54 @@ func stringToIntSlice(str string) []int {
 	}
 	return res
 }
+
+func getRanking() FullAnnotations {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	if err != nil {
+		panic(err)
+	}
+
+	// 複数レコード取得
+	rows, err := db.Query(
+		`SELECT ANNOTATIONS.ID, TITLE, ARTISTS, TAGS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE, TAGIDS, NICENUM FROM ANNOTATIONS INNER JOIN TRANSANNOTATIONS ON ANNOTATIONS.ID = TRANSANNOTATIONS.ID ORDER BY NICENUM DESC`)
+	if err != nil {
+		panic(err)
+	}
+	var fullAnnotations FullAnnotations
+	// 処理が終わったらカーソルを閉じる
+	defer rows.Close()
+	for rows.Next() {
+
+		var ID int
+		var Title string
+		var Artists string
+		var Tags string
+		var Description string
+		var ArtistImageURLs string
+		var LocationImageURLs string
+		var VideoIds string
+		var StartTime string // Time.timeだとScan時にエラーになる
+		var EndTime string
+		var Price int
+		var PriceText string
+		var SourceURL string
+		var LocationName string
+		var Coordinate Coordinate
+		var TagIds string
+		var NiceNum int
+
+		// カーソルから値を取得
+		if err := rows.Scan(&ID, &Title, &Artists, &Tags, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &Price, &PriceText, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude, &TagIds, &NiceNum); err != nil {
+			log.Fatal("rows.Scan()", err)
+			return fullAnnotations
+		}
+		fullAnnotation := NewFullAnnotation(ID, Title, stringToSlice(Artists), stringToSlice(Tags), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude, stringToIntSlice(TagIds), NiceNum)
+
+		fullAnnotations = append(fullAnnotations, *fullAnnotation)
+
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Tags: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, Price: %d, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f, TagIds: %s, NiceNum: %d \n",
+			ID, Title, Artists, Tags, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude, TagIds, NiceNum)
+	}
+	return fullAnnotations
+}

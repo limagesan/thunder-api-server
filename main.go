@@ -58,5 +58,7 @@ func main() {
 	router.POST("/trans/annotations/:annotationId/niceNum/increment", IDShouldBeInt(IncrementNiceNum, "increment-niceNum", "annotationId"))
 	router.POST("/trans/annotations/:annotationId/niceNum/decrement", IDShouldBeInt(DecrementNiceNum, "decrement-niceNum", "annotationId"))
 
+	router.GET("/ranking", CommonHeaders(Ranking, "ranking"))
+
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

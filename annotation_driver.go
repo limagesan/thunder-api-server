@@ -32,15 +32,9 @@ func copyAnnotations() {
 	if err != nil {
 		panic(err)
 	}
-	now := time.Now()
-	afterTwoDays := now.Add(CACHEDATE * 24 * time.Hour)
 
 	// 複数レコード取得
-	rows, err := db.Query(
-		`SELECT * FROM ANNOTATIONS`,
-		now.String(),
-		afterTwoDays.String(),
-	)
+	rows, err := db.Query(`SELECT * FROM ANNOTATIONS`)
 	if err != nil {
 		panic(err)
 	}

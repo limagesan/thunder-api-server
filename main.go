@@ -15,6 +15,10 @@ func main() {
 	}
 
 	// db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+
+	// res, err = db.Exec(`SELECT ID DESCRIPTION WHERE LOCATIONNAME=?`, "Contact Tokyo")
+
+	// db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	// if err != nil {
 	// 	panic(err)
 	// }
@@ -33,8 +37,8 @@ func main() {
 	createTransAnnotationTable()
 	createTagTable()
 
-	// removeAllAnnotations()
-	// copyAnnotations()
+	removeAllAnnotations()
+	copyAnnotations()
 	// insertTestData()
 
 	annotations := getAnnotations()

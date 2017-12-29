@@ -52,29 +52,28 @@ func copyAnnotations() {
 		var ID int
 		var Title string
 		var Artists string
-		var Tags string
 		var Description string
 		var ArtistImageURLs string
 		var LocationImageURLs string
 		var VideoIds string
 		var StartTime string // Time.timeだとScan時にエラーになる
 		var EndTime string
-		var Price int
+		var TimeText string
 		var PriceText string
-		var SourceURL string
+		var SourceURLs string
 		var LocationName string
 		var Coordinate Coordinate
 
 		// カーソルから値を取得
-		if err := rows.Scan(&ID, &Title, &Artists, &Tags, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &Price, &PriceText, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+		if err := rows.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
 			log.Fatal("rows.Scan()", err)
 		}
-		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), stringToSlice(Tags), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude)
 
 		_annotations = append(_annotations, *annotation)
 
-		fmt.Printf("ID: %d, Title: %s, Artists: %s, Tags: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, Price: %d, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
-			ID, Title, Artists, Tags, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, TimeText: %s, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, Title, Artists, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, TimeText, PriceText, SourceURLs, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 
 	}
 
@@ -93,7 +92,7 @@ func createAnnotationTable() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "TAGS" VARCHAR(255),"DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "PRICE" INTEGER, "PRICETEXT" VARCHAR(255), "SOURCEURL" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "TIMETEXT" VARCHAR(255), "PRICETEXT" VARCHAR(255), "SOURCEURLS" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
 	)
 	if err != nil {
 		panic(err)
@@ -108,8 +107,8 @@ func insertAnnotation(annotation Annotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (ID, TITLE, ARTISTS, TAGS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-		annotation.ID, annotation.Title, sliceToString(annotation.Artists), sliceToString(annotation.Tags), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.Price, annotation.PriceText, annotation.SourceURL, annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
+		`INSERT INTO ANNOTATIONS (ID, TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		annotation.ID, annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
 		panic(err)
@@ -149,30 +148,29 @@ func getAnnotations() Annotations {
 		var ID int
 		var Title string
 		var Artists string
-		var Tags string
 		var Description string
 		var ArtistImageURLs string
 		var LocationImageURLs string
 		var VideoIds string
 		var StartTime string // Time.timeだとScan時にエラーになる
 		var EndTime string
-		var Price int
+		var TimeText string
 		var PriceText string
-		var SourceURL string
+		var SourceURLs string
 		var LocationName string
 		var Coordinate Coordinate
 
 		// カーソルから値を取得
-		if err := rows.Scan(&ID, &Title, &Artists, &Tags, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &Price, &PriceText, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+		if err := rows.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
 			log.Fatal("rows.Scan()", err)
 			return annotations
 		}
-		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), stringToSlice(Tags), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude)
 
 		annotations = append(annotations, *annotation)
 
-		fmt.Printf("ID: %d, Title: %s, Artists: %s, Tags: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, Price: %d, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
-			ID, Title, Artists, Tags, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, TimeText: %s, PriceText: %s, SourceURLs: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, Title, Artists, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, TimeText, PriceText, SourceURLs, LocationName, Coordinate.Latitude, Coordinate.Longitude)
 	}
 	return annotations
 }
@@ -310,7 +308,7 @@ func getRanking() FullAnnotations {
 
 	// 複数レコード取得
 	rows, err := db.Query(
-		`SELECT ANNOTATIONS.ID, TITLE, ARTISTS, TAGS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, PRICE, PRICETEXT, SOURCEURL, LOCATIONNAME, LATITUDE, LONGITUDE, TAGIDS, NICENUM FROM ANNOTATIONS INNER JOIN TRANSANNOTATIONS ON ANNOTATIONS.ID = TRANSANNOTATIONS.ID ORDER BY NICENUM DESC`)
+		`SELECT ANNOTATIONS.ID, TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE, TAGIDS, NICENUM FROM ANNOTATIONS INNER JOIN TRANSANNOTATIONS ON ANNOTATIONS.ID = TRANSANNOTATIONS.ID ORDER BY NICENUM DESC`)
 	if err != nil {
 		panic(err)
 	}
@@ -322,32 +320,31 @@ func getRanking() FullAnnotations {
 		var ID int
 		var Title string
 		var Artists string
-		var Tags string
 		var Description string
 		var ArtistImageURLs string
 		var LocationImageURLs string
 		var VideoIds string
 		var StartTime string // Time.timeだとScan時にエラーになる
 		var EndTime string
-		var Price int
+		var TimeText string
 		var PriceText string
-		var SourceURL string
+		var SourceURLs string
 		var LocationName string
 		var Coordinate Coordinate
 		var TagIds string
 		var NiceNum int
 
 		// カーソルから値を取得
-		if err := rows.Scan(&ID, &Title, &Artists, &Tags, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &Price, &PriceText, &SourceURL, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude, &TagIds, &NiceNum); err != nil {
+		if err := rows.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude, &TagIds, &NiceNum); err != nil {
 			log.Fatal("rows.Scan()", err)
 			return fullAnnotations
 		}
-		fullAnnotation := NewFullAnnotation(ID, Title, stringToSlice(Artists), stringToSlice(Tags), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude, stringToIntSlice(TagIds), NiceNum)
+		fullAnnotation := NewFullAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude, stringToIntSlice(TagIds), NiceNum)
 
 		fullAnnotations = append(fullAnnotations, *fullAnnotation)
 
-		fmt.Printf("ID: %d, Title: %s, Artists: %s, Tags: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, Price: %d, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f, TagIds: %s, NiceNum: %d \n",
-			ID, Title, Artists, Tags, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, Price, PriceText, SourceURL, LocationName, Coordinate.Latitude, Coordinate.Longitude, TagIds, NiceNum)
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, TimeText: %s, PriceText: %s, SourceURLs: %s, LocationName: %s, Latitude: %f, Longitude: %f, TagIds: %s, NiceNum: %d \n",
+			ID, Title, Artists, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, TimeText, PriceText, SourceURLs, LocationName, Coordinate.Latitude, Coordinate.Longitude, TagIds, NiceNum)
 	}
 	return fullAnnotations
 }

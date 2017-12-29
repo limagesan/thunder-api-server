@@ -13,7 +13,6 @@ func IDShouldBeInt(h httprouter.Handle, name string, idName string) httprouter.H
 
 		idParam := ps.ByName(idName)
 		_, err := strconv.Atoi(idParam)
-		print("IDSHOULDBEINT", idParam)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 			w.WriteHeader(500)

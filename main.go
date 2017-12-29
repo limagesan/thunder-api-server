@@ -33,9 +33,10 @@ func main() {
 	createTransAnnotationTable()
 	createTagTable()
 
-	removeAllAnnotations()
-	copyAnnotations()
+	// removeAllAnnotations()
+	// copyAnnotations()
 	// insertTestData()
+
 	annotations := getAnnotations()
 	updateTransAnnotationsDB(annotations)
 	RepoUpdateAnnotations(annotations)

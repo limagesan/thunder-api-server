@@ -73,8 +73,30 @@ func copyAnnotations() {
 
 	fmt.Println("checkAnnotations", _annotations)
 	for i := 0; i < len(_annotations); i++ {
-		insertAnnotation(_annotations[i])
+		addNewAnnotation(_annotations[i])
 	}
+}
+
+func addNewAnnotation(annotation Annotation) {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	if err != nil {
+		panic(err)
+	}
+	// データの挿入
+	res, err := db.Exec(
+		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT * FROM ANNOTATIONS WHERE TITLE = ?)`,
+		annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude, annotation.Title)
+	if err != nil {
+		panic(err)
+	}
+
+	// 挿入処理の結果からIDを取得
+	id, err := res.LastInsertId()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("lastInsertId", id)
 }
 
 func createAnnotationTable() {
@@ -86,7 +108,7 @@ func createAnnotationTable() {
 
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "TIMETEXT" VARCHAR(255), "PRICETEXT" VARCHAR(255), "SOURCEURLS" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
+		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "TIMETEXT" VARCHAR(255), "PRICETEXT" VARCHAR(255), "SOURCEURLS" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
 	)
 	if err != nil {
 		panic(err)
@@ -101,8 +123,8 @@ func insertAnnotation(annotation Annotation) {
 	}
 	// データの挿入
 	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (ID, TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-		annotation.ID, annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
+		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
 	)
 	if err != nil {
 		panic(err)
@@ -114,6 +136,53 @@ func insertAnnotation(annotation Annotation) {
 		panic(err)
 	}
 	fmt.Println("lastInsertId", id)
+}
+
+func getAllAnnotations() Annotations {
+	// データベースのコネクションを開く
+	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
+	if err != nil {
+		panic(err)
+	}
+
+	// 複数レコード取得
+	rows, err := db.Query(`SELECT * FROM ANNOTATIONS ORDER BY	STARTTIME`)
+	if err != nil {
+		panic(err)
+	}
+	var annotations Annotations
+	// 処理が終わったらカーソルを閉じる
+	defer rows.Close()
+	for rows.Next() {
+
+		var ID int
+		var Title string
+		var Artists string
+		var Description string
+		var ArtistImageURLs string
+		var LocationImageURLs string
+		var VideoIds string
+		var StartTime string // Time.timeだとScan時にエラーになる
+		var EndTime string
+		var TimeText string
+		var PriceText string
+		var SourceURLs string
+		var LocationName string
+		var Coordinate Coordinate
+
+		// カーソルから値を取得
+		if err := rows.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+			log.Fatal("rows.Scan()", err)
+			return annotations
+		}
+		annotation := NewAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude)
+
+		annotations = append(annotations, *annotation)
+
+		fmt.Printf("ID: %d, Title: %s, Artists: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, TimeText: %s, PriceText: %s, SourceURLs: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
+			ID, Title, Artists, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, TimeText, PriceText, SourceURLs, LocationName, Coordinate.Latitude, Coordinate.Longitude)
+	}
+	return annotations
 }
 
 func getAnnotations(headTime time.Time, tailTime time.Time) Annotations {

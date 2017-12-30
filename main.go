@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -38,13 +37,8 @@ func main() {
 	createTransAnnotationTable()
 	createTagTable()
 
-	// removeAllAnnotations()
-	// copyAnnotations()
-	// insertTestData()
-	now := time.Now()
-	annotations := getAnnotations(now, now)
-	updateTransAnnotationsDB(annotations)
-	// RepoUpdateAnnotations(annotations)
+	copyAnnotations()
+	updateTransAnnotationsDB()
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))

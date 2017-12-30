@@ -8,7 +8,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func updateTransAnnotationsDB(annotations Annotations) {
+// Annotationsに存在しているデータのTransAnnotationデータがなかったら追加する
+func updateTransAnnotationsDB() {
+	annotations := getAllAnnotations()
+
 	var willDeleteIds []int
 	var willAddIds []int
 	transAnnotations := getTransAnnotations()

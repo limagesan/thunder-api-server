@@ -50,10 +50,7 @@ func main() {
 	router.GET("/", Logging(Index, "index"))
 	router.GET("/annotations", CommonHeaders(AnnotationIndex, "annotation-index"))
 
-	router.GET("/annotations/:annotationId", IDShouldBeInt(AnnotationShow, "annotation-show", []string{"annotationId"}))
-	router.POST("/annotations", CommonHeaders(AnnotationCreate, "annotation-create"))
-	router.DELETE("/annotations/:annotationId", IDShouldBeInt(AnnotationDelete, "annotation-delete", []string{"annotationId"}))
-	router.GET("/select/annotations/:year/:month/:day/:hour/:min", IDShouldBeInt(AnnotationIndex2, "annotation-select-index", []string{"year", "month", "day", "hour", "min"}))
+	router.GET("/select/annotations/:year/:month/:day/:hour/:min", IDShouldBeInt(AnnotationIndex, "annotation-select-index", []string{"year", "month", "day", "hour", "min"}))
 
 	router.GET("/trans/annotations", CommonHeaders(TransAnnotationIndex, "trans-annotation-index"))
 	router.GET("/trans/annotations/:annotationId", IDShouldBeInt(TransAnnotationShow, "trans-annotation-show", []string{"annotationId"}))

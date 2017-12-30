@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -30,6 +31,58 @@ func AnnotationIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 		}
 	}
 	annotations = _annotations
+
+	if err := json.NewEncoder(w).Encode(annotations); err != nil {
+		panic(err)
+	}
+}
+
+func returnMonth(month int) (time.Month, error) {
+	switch month {
+	case 1:
+		return time.January, nil
+	case 2:
+		return time.February, nil
+	case 3:
+		return time.March, nil
+	case 4:
+		return time.April, nil
+	case 5:
+		return time.May, nil
+	case 6:
+		return time.June, nil
+	case 7:
+		return time.July, nil
+	case 8:
+		return time.August, nil
+	case 9:
+		return time.September, nil
+	case 10:
+		return time.October, nil
+	case 11:
+		return time.November, nil
+	case 12:
+		return time.December, nil
+	default:
+		return time.January, errors.New("Unexpected Number.")
+	}
+}
+
+func AnnotationIndex2(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
+	year, _ := strconv.Atoi(ps.ByName("year"))
+	monthInt, _ := strconv.Atoi(ps.ByName("month"))
+	month, _ := returnMonth(monthInt)
+	day, _ := strconv.Atoi(ps.ByName("day"))
+	hour, _ := strconv.Atoi(ps.ByName("hour"))
+	min, _ := strconv.Atoi(ps.ByName("min"))
+
+	/* EndTimeを過ぎたアノテーションはキャッシュから消す */
+
+	headTime := time.Date(year, month, day, hour, min, 0, 0, time.UTC)
+	tailTime := headTime.Add(6 * time.Hour)
+
+	annotations := getAnnotations(headTime, tailTime)
 
 	if err := json.NewEncoder(w).Encode(annotations); err != nil {
 		panic(err)

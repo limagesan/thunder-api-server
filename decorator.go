@@ -8,18 +8,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func IDShouldBeInt(h httprouter.Handle, name string, idName string) httprouter.Handle {
+func IDShouldBeInt(h httprouter.Handle, name string, idNames []string) httprouter.Handle {
 	return CommonHeaders(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
-		idParam := ps.ByName(idName)
-		_, err := strconv.Atoi(idParam)
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-			w.WriteHeader(500)
-			if err := json.NewEncoder(w).Encode(err); err != nil {
+		for i := 0; i < len(idNames); i++ {
+			idParam := ps.ByName(idNames[i])
+			_, err := strconv.Atoi(idParam)
+			if err != nil {
+				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+				w.WriteHeader(500)
+				if err := json.NewEncoder(w).Encode(err); err != nil {
+					return
+				}
 				return
 			}
-			return
 		}
 
 		h(w, r, ps)

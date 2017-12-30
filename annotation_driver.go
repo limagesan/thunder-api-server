@@ -116,20 +116,18 @@ func insertAnnotation(annotation Annotation) {
 	fmt.Println("lastInsertId", id)
 }
 
-func getAnnotations() Annotations {
+func getAnnotations(headTime time.Time, tailTime time.Time) Annotations {
 	// データベースのコネクションを開く
 	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 	if err != nil {
 		panic(err)
 	}
-	now := time.Now()
-	afterTwoDays := now.Add(CACHEDATE * 24 * time.Hour)
 
 	// 複数レコード取得
 	rows, err := db.Query(
 		`SELECT * FROM ANNOTATIONS WHERE ? < STARTTIME AND STARTTIME < ? ORDER BY	STARTTIME`,
-		now.String(),
-		afterTwoDays.String(),
+		headTime.String(),
+		tailTime.String(),
 	)
 	if err != nil {
 		panic(err)

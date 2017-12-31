@@ -47,9 +47,9 @@ func updateTransAnnotationsDB() {
 		insertTransAnnotation(*annotation)
 	}
 
-	for i := 0; i < len(willDeleteIds); i++ {
-		deleteTransAnnotation(willDeleteIds[i])
-	}
+	// for i := 0; i < len(willDeleteIds); i++ {
+	// 	deleteTransAnnotation(willDeleteIds[i])
+	// }
 }
 
 func createTransAnnotationTable() {

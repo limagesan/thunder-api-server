@@ -35,11 +35,11 @@ func updateTransAnnotationsDB() {
 				isFound = true
 			}
 		}
-		if !isFound {
+		if isFound == false {
 			willDeleteIds = append(willDeleteIds, transAnnotations[i].ID)
 		}
 	}
-
+	fmt.Println("willAddIds", willAddIds, "willDeleteIds", willDeleteIds)
 	for i := 0; i < len(willAddIds); i++ {
 		var tagIds []int
 

@@ -161,8 +161,23 @@ func updateTransAnnotation(id int, transAnnotation TransAnnotation) []int {
 	if err != nil {
 		panic(err)
 	}
-	// 更新
 
+	// 同じタグIDが複数存在したら一つにする
+	var tempArr []int
+	for i := 0; i < len(transAnnotation.TagIds); i++ {
+		found := false
+		for k := 0; k < len(tempArr); k++ {
+			if transAnnotation.TagIds[i] == tempArr[k] {
+				found = true
+			}
+		}
+		if !found {
+			tempArr = append(tempArr, transAnnotation.TagIds[i])
+		}
+	}
+	transAnnotation.TagIds = tempArr
+
+	// 更新
 	res, err := db.Exec(
 		`UPDATE TRANSANNOTATIONS SET TAGIDS=? WHERE ID=?`,
 		intSliceToString(transAnnotation.TagIds),

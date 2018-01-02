@@ -1,49 +1,61 @@
 {
-  "comment": "",
-  "ignore": "test",
-  "package": [
-    {
-      "checksumSHA1": "LlvQPCCJxa/4kNQDPBM5fZrtAnU=",
-      "path": "github.com/PuerkitoBio/goquery",
-      "revision": "bc4e06eb0792d1a14661d19dd7822163c25bb6bd",
-      "revisionTime": "2017-12-06T12:16:06Z"
-    },
-    {
-      "checksumSHA1": "2rWSos1D+xqNSGkvEMOG3pntod8=",
-      "path": "github.com/andybalholm/cascadia",
-      "revision": "349dd0209470eabd9514242c688c403c0926d266",
-      "revisionTime": "2016-12-24T14:14:13Z"
-    },
-    {
-      "checksumSHA1": "rylbYOEA1HI2BfUOOz0QRmCf5ks=",
-      "path": "github.com/julienschmidt/httprouter",
-      "revision": "e1b9828bc9e5904baec057a154c09ca40fe7fae0",
-      "revisionTime": "2017-10-27T13:37:09Z"
-    },
-    {
-      "checksumSHA1": "zKDmGyNRpAeeTGXwzKEvy+UY/QQ=",
-      "path": "github.com/mattn/go-sqlite3",
-      "revision": "d5ffb5c0cca8778699a929b236766f4a7af674e8",
-      "revisionTime": "2017-11-22T00:24:37Z"
-    },
-    {
-      "checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
-      "path": "golang.org/x/net/context",
-      "revision": "a8b9294777976932365dabb6640cf1468d95c70f",
-      "revisionTime": "2017-11-29T19:21:16Z"
-    },
-    {
-      "checksumSHA1": "2t6c6F2y4b/PEV04TOHpQxh/xLc=",
-      "path": "golang.org/x/net/html",
-      "revision": "a8b9294777976932365dabb6640cf1468d95c70f",
-      "revisionTime": "2017-11-29T19:21:16Z"
-    },
-    {
-      "checksumSHA1": "iWvOOLdDxvI4AVX6px6/HYBPeaQ=",
-      "path": "golang.org/x/net/html/atom",
-      "revision": "a8b9294777976932365dabb6640cf1468d95c70f",
-      "revisionTime": "2017-11-29T19:21:16Z"
-    }
-  ],
-  "rootPath": "thunder-api-server-go"
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "LlvQPCCJxa/4kNQDPBM5fZrtAnU=",
+			"path": "github.com/PuerkitoBio/goquery",
+			"revision": "bc4e06eb0792d1a14661d19dd7822163c25bb6bd",
+			"revisionTime": "2017-12-06T12:16:06Z"
+		},
+		{
+			"checksumSHA1": "2rWSos1D+xqNSGkvEMOG3pntod8=",
+			"path": "github.com/andybalholm/cascadia",
+			"revision": "349dd0209470eabd9514242c688c403c0926d266",
+			"revisionTime": "2016-12-24T14:14:13Z"
+		},
+		{
+			"checksumSHA1": "rylbYOEA1HI2BfUOOz0QRmCf5ks=",
+			"path": "github.com/julienschmidt/httprouter",
+			"revision": "e1b9828bc9e5904baec057a154c09ca40fe7fae0",
+			"revisionTime": "2017-10-27T13:37:09Z"
+		},
+		{
+			"checksumSHA1": "IfZcD4U1dtllJKlPNeD2aU4Jn98=",
+			"path": "github.com/lib/pq",
+			"revision": "83612a56d3dd153a94a629cd64925371c9adad78",
+			"revisionTime": "2017-11-26T05:04:59Z"
+		},
+		{
+			"checksumSHA1": "AU3fA8Sm33Vj9PBoRPSeYfxLRuE=",
+			"path": "github.com/lib/pq/oid",
+			"revision": "83612a56d3dd153a94a629cd64925371c9adad78",
+			"revisionTime": "2017-11-26T05:04:59Z"
+		},
+		{
+			"checksumSHA1": "zKDmGyNRpAeeTGXwzKEvy+UY/QQ=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "d5ffb5c0cca8778699a929b236766f4a7af674e8",
+			"revisionTime": "2017-11-22T00:24:37Z"
+		},
+		{
+			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
+			"path": "golang.org/x/net/context",
+			"revision": "a8b9294777976932365dabb6640cf1468d95c70f",
+			"revisionTime": "2017-11-29T19:21:16Z"
+		},
+		{
+			"checksumSHA1": "2t6c6F2y4b/PEV04TOHpQxh/xLc=",
+			"path": "golang.org/x/net/html",
+			"revision": "a8b9294777976932365dabb6640cf1468d95c70f",
+			"revisionTime": "2017-11-29T19:21:16Z"
+		},
+		{
+			"checksumSHA1": "iWvOOLdDxvI4AVX6px6/HYBPeaQ=",
+			"path": "golang.org/x/net/html/atom",
+			"revision": "a8b9294777976932365dabb6640cf1468d95c70f",
+			"revisionTime": "2017-11-29T19:21:16Z"
+		}
+	],
+	"rootPath": "thunder-api-server-go"
 }

@@ -1,23 +1,16 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 func createTagTable() {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-
 	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "TAGS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "NAME" VARCHAR(255), "COLOR" VARCHAR(255))`,
+		`create table if not exists "tags" ("id" serial primary key unique, "name" varchar(255), "color" varchar(255))`,
 	)
 	if err != nil {
 		panic(err)
@@ -25,35 +18,20 @@ func createTagTable() {
 }
 
 func insertTag(tag Tag) int {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
 	// データの挿入
-	res, err := db.Exec(`INSERT INTO TAGS (NAME, COLOR) VALUES (?,?)`, tag.Name, tag.Color)
+	var id int
+	err := db.QueryRow(`insert into tags (name, color) values ($1,$2) returning id`, tag.Name, tag.Color).Scan(&id)
 	if err != nil {
 		panic(err)
 	}
 
-	// 挿入処理の結果からIDを取得
-	id, err := res.LastInsertId()
-	if err != nil {
-		panic(err)
-	}
 	fmt.Println("lastInsertId", id)
 	return int(id)
 }
 
 func getTags() Tags {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-
 	// 複数レコード取得
-	rows, err := db.Query(`SELECT * FROM TAGS`)
+	rows, err := db.Query(`select * from tags`)
 	if err != nil {
 		panic(err)
 	}
@@ -80,14 +58,9 @@ func getTags() Tags {
 }
 
 func deleteTag(id int) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
 	// 削除
 	res, err := db.Exec(
-		`DELETE FROM TAGS WHERE ID=?`,
+		`delete from tags where id=$1`,
 		id,
 	)
 	if err != nil {

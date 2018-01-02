@@ -8,33 +8,25 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 const CACHEDATE = 5
 
 func removeAllAnnotations() {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// データの挿入
-	_, err = db.Exec(`DELETE FROM ANNOTATIONS`)
+	_, err = db.Exec(`delete from annotations`)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func copyAnnotations() {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/thunder.db")
+	_db, err := sql.Open("postgres", "user=hiroki dbname=thunder-scrape sslmode=disable")
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error opening database: %q", err)
 	}
-
-	// 複数レコード取得
-	rows, err := db.Query(`SELECT * FROM ANNOTATIONS`)
+	defer _db.Close()
+	rows, err := _db.Query(`select * from annotations`)
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +60,6 @@ func copyAnnotations() {
 
 		fmt.Printf("ID: %d, Title: %s, Artists: %s, Description: %s, ArtistImageURLs: %s, LocationImageURLs: %s, VideoIds: %s, StartTime: %s, EndTime: %s, TimeText: %s, PriceText: %s, SourceURL: %s, LocationName: %s, Latitude: %f, Longitude: %f\n",
 			ID, Title, Artists, Description, ArtistImageURLs, LocationImageURLs, VideoIds, StartTime, EndTime, TimeText, PriceText, SourceURLs, LocationName, Coordinate.Latitude, Coordinate.Longitude)
-
 	}
 
 	fmt.Println("checkAnnotations", _annotations)
@@ -78,37 +69,27 @@ func copyAnnotations() {
 }
 
 func addNewAnnotation(annotation Annotation) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// データの挿入
-	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT * FROM ANNOTATIONS WHERE TITLE = ?)`,
+	var id int
+	rows, err := db.Query(
+		`insert into "annotations" (title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude) select $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14 where not exists(select * from annotations where title = $15) returning id`,
 		annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude, annotation.Title)
 	if err != nil {
 		panic(err)
 	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&id)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("lastInsertId", id)
 
-	// 挿入処理の結果からIDを取得
-	id, err := res.LastInsertId()
-	if err != nil {
-		panic(err)
 	}
-	fmt.Println("lastInsertId", id)
 }
 
 func createAnnotationTable() {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-
-	// テーブル作成
 	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS "ANNOTATIONS" ("ID" INTEGER PRIMARY KEY AUTOINCREMENT, "TITLE" VARCHAR(255), "ARTISTS" VARCHAR(255), "DESCRIPTION" VARCHAR(255),"ARTISTIMAGEURLS" TEXT, "LOCATIONIMAGEURLS" TEXT ,"VIDEOIDS" TEXT,"STARTTIME" VARCHAR(255), "ENDTIME" VARCHAR(255), "TIMETEXT" VARCHAR(255), "PRICETEXT" VARCHAR(255), "SOURCEURLS" VARCHAR(255), "LOCATIONNAME" VARCHAR(255), "LATITUDE" REAL, "LONGITUDE" REAL)`,
+		`create table if not exists "annotations" ("id" serial primary key unique, "title" text, "artists" text, "description" text,"artistimageurls" text, "locationimageurls" text ,"videoids" text,"starttime" text, "endtime" text, "timetext" text, "pricetext" text, "sourceurls" text, "locationname" text, "latitude" float8, "longitude" float8)`,
 	)
 	if err != nil {
 		panic(err)
@@ -116,22 +97,11 @@ func createAnnotationTable() {
 }
 
 func insertAnnotation(annotation Annotation) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// データの挿入
-	res, err := db.Exec(
-		`INSERT INTO ANNOTATIONS (TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+	var id int
+	err = db.QueryRow(
+		`insert into "annotations" (title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) returning id`,
 		annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude,
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	// 挿入処理の結果からIDを取得
-	id, err := res.LastInsertId()
+	).Scan(&id)
 	if err != nil {
 		panic(err)
 	}
@@ -139,14 +109,8 @@ func insertAnnotation(annotation Annotation) {
 }
 
 func getAllAnnotations() Annotations {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-
 	// 複数レコード取得
-	rows, err := db.Query(`SELECT * FROM ANNOTATIONS ORDER BY	STARTTIME`)
+	rows, err := db.Query(`select * from annotations order by	starttime`)
 	if err != nil {
 		panic(err)
 	}
@@ -186,15 +150,8 @@ func getAllAnnotations() Annotations {
 }
 
 func getAnnotations(headTime time.Time, tailTime time.Time) Annotations {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-
-	// 複数レコード取得
 	rows, err := db.Query(
-		`SELECT * FROM ANNOTATIONS WHERE ? < ENDTIME AND STARTTIME < ? ORDER BY	STARTTIME`,
+		`select * from annotations where $1 < endtime and starttime < $2 order by	starttime`,
 		headTime.String(),
 		tailTime.String(),
 	)
@@ -237,14 +194,9 @@ func getAnnotations(headTime time.Time, tailTime time.Time) Annotations {
 }
 
 func getAnnotation(id int) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// 1件取得
+
 	row := db.QueryRow(
-		`SELECT * FROM ANNOTATIONS WHERE ID=?`,
+		`select * from annotations where id=$1`,
 		id,
 	)
 
@@ -264,14 +216,8 @@ func getAnnotation(id int) {
 }
 
 func updateAnnotation(id int) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// 更新
 	res, err := db.Exec(
-		`UPDATE ANNOTATIONS SET TITLE=? WHERE ID=?`,
+		`update annotations set title=$1 where id=$2`,
 		"update title",
 		id,
 	)
@@ -289,14 +235,8 @@ func updateAnnotation(id int) {
 }
 
 func deleteAnnotation(id int) {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-	// 削除
 	res, err := db.Exec(
-		`DELETE FROM ANNOTATIONS WHERE ID=?`,
+		`delete from annotations where id=$1`,
 		id,
 	)
 	if err != nil {
@@ -361,18 +301,12 @@ func stringToIntSlice(str string) []int {
 }
 
 func getRanking() FullAnnotations {
-	// データベースのコネクションを開く
-	db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	if err != nil {
-		panic(err)
-	}
-
 	now := time.Now()
 	tailTime := now.Add(7 * 24 * time.Hour)
 	sampleLimit := 30
 	// 複数レコード取得
 	rows, err := db.Query(
-		`SELECT ANNOTATIONS.ID, TITLE, ARTISTS, DESCRIPTION, ARTISTIMAGEURLS, LOCATIONIMAGEURLS, VIDEOIDS, STARTTIME, ENDTIME, TIMETEXT, PRICETEXT, SOURCEURLS, LOCATIONNAME, LATITUDE, LONGITUDE, TAGIDS, NICENUM FROM ANNOTATIONS INNER JOIN TRANSANNOTATIONS ON ANNOTATIONS.ID = TRANSANNOTATIONS.ID WHERE ? < ENDTIME AND ENDTIME < ?  ORDER BY NICENUM DESC, STARTTIME ASC LIMIT ?`,
+		`select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where $1 < endtime and endtime < $2  order by nicenum desc, starttime asc limit $3`,
 		now.String(),
 		tailTime.String(),
 		sampleLimit)
@@ -380,7 +314,7 @@ func getRanking() FullAnnotations {
 		panic(err)
 	}
 
-	// WHERE ? < STARTTIME AND STARTTIME < ? ORDER BY	STARTTIME`,
+	// WHERE $ < STARTTIME AND STARTTIME < $ ORDER BY	STARTTIME`,
 	// 	headTime.String(),
 	// 	tailTime.String(),
 	var fullAnnotations FullAnnotations

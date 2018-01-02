@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -8,11 +9,25 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+var (
+	connStr string = "user=hiroki dbname=thunder-prod sslmode=disable"
+	db      *sql.DB
+	err     error
+)
+
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
+	if os.Getenv("DATABASE_URL") != "" {
+		connStr = os.Getenv("DATABASE_URL")
+	}
+	db, err = sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Error opening database: %q", err)
+	}
+	defer db.Close()
 
 	// db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
 
@@ -38,7 +53,7 @@ func main() {
 	createTagTable()
 
 	copyAnnotations()
-	// updateTransAnnotationsDB()
+	updateTransAnnotationsDB()
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))

@@ -29,31 +29,12 @@ func main() {
 	}
 	defer db.Close()
 
-	// db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-
-	// res, err = db.Exec(`SELECT ID DESCRIPTION WHERE LOCATIONNAME=?`, "Contact Tokyo")
-
-	// db, err := sql.Open("sqlite3", "./database/trans-thunder.db")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// // 削除
-	// _, err = db.Exec(
-	// 	`DROP TABLE ANNOTATIONS`,
-	// )
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// return
-
-	// scraping()
 	createAnnotationTable()
 	createTransAnnotationTable()
 	createTagTable()
 
-	copyAnnotations()
-	updateTransAnnotationsDB()
+	// copyAnnotations()
+	// updateTransAnnotationsDB()
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))

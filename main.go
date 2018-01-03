@@ -33,8 +33,8 @@ func main() {
 	createTransAnnotationTable()
 	createTagTable()
 
-	// copyAnnotations()
-	// updateTransAnnotationsDB()
+	copyAnnotations()
+	updateTransAnnotationsDB()
 
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))

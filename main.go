@@ -33,7 +33,9 @@ func main() {
 	createTransAnnotationTable()
 	createTagTable()
 
-	copyAnnotations()
+	if os.Getenv("DATABASE_URL") == "" {
+		copyAnnotations()
+	}
 	updateTransAnnotationsDB()
 
 	router := httprouter.New()

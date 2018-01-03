@@ -303,7 +303,7 @@ func stringToIntSlice(str string) []int {
 func getRanking() FullAnnotations {
 	now := time.Now()
 	tailTime := now.Add(30 * 24 * time.Hour)
-	sampleLimit := 50
+	sampleLimit := 30
 	// 複数レコード取得
 	rows, err := db.Query(
 		`select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where $1 < endtime and endtime < $2  order by nicenum desc, starttime asc limit $3`,

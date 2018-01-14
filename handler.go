@@ -51,6 +51,19 @@ func returnMonth(month int) (time.Month, error) {
 
 func AnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
+
+	headTime := time.Now()
+	tailTime := headTime.Add(30 * 24 * time.Hour)
+
+	annotations := getAnnotations(headTime, tailTime)
+
+	if err := json.NewEncoder(w).Encode(annotations); err != nil {
+		panic(err)
+	}
+}
+
+func SelectAnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
 	year, _ := strconv.Atoi(ps.ByName("year"))
 	monthInt, _ := strconv.Atoi(ps.ByName("month"))
 	month, _ := returnMonth(monthInt)
@@ -58,10 +71,8 @@ func AnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	hour, _ := strconv.Atoi(ps.ByName("hour"))
 	min, _ := strconv.Atoi(ps.ByName("min"))
 
-	/* EndTimeを過ぎたアノテーションはキャッシュから消す */
-
 	headTime := time.Date(year, month, day, hour, min, 0, 0, time.UTC)
-	tailTime := headTime.Add(6 * time.Hour)
+	tailTime := headTime.Add(12 * time.Hour)
 
 	annotations := getAnnotations(headTime, tailTime)
 

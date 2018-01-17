@@ -41,6 +41,7 @@ func main() {
 	router := httprouter.New()
 	router.GET("/", Logging(Index, "index"))
 	router.GET("/annotations", CommonHeaders(AnnotationIndex, "annotation-index"))
+	router.GET("/annotations/:annotationId", IDShouldBeInt(AnnotationShow, "annotation-show", []string{"annotationId"}))
 
 	router.GET("/select/annotations/:year/:month/:day/:hour/:min", IDShouldBeInt(SelectAnnotationIndex, "annotation-select-index", []string{"year", "month", "day", "hour", "min"}))
 

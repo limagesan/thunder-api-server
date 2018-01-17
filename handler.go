@@ -62,6 +62,18 @@ func AnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	}
 }
 
+func AnnotationShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("annotationId"))
+	t := getAnnotation(id)
+	if t.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		panic(err)
+	}
+}
+
 func SelectAnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
 	year, _ := strconv.Atoi(ps.ByName("year"))

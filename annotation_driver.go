@@ -193,26 +193,45 @@ func getAnnotations(headTime time.Time, tailTime time.Time) Annotations {
 	return annotations
 }
 
-func getAnnotation(id int) {
+func getAnnotation(id int) Annotation {
+	var annotation *Annotation
 
 	row := db.QueryRow(
 		`select * from annotations where id=$1`,
 		id,
 	)
 
-	var id2 int
-	var title string
-	err2 := row.Scan(&id2, &title)
+	var ID int
+	var Title string
+	var Artists string
+	var Description string
+	var ArtistImageURLs string
+	var LocationImageURLs string
+	var VideoIds string
+	var StartTime string // Time.timeだとScan時にエラーになる
+	var EndTime string
+	var TimeText string
+	var PriceText string
+	var SourceURLs string
+	var LocationName string
+	var Coordinate Coordinate
+	if err := row.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+		log.Fatal("rows.Scan()", err)
+		return *annotation
+	}
 
 	// エラー内容による分岐
 	switch {
-	case err2 == sql.ErrNoRows:
+	case err == sql.ErrNoRows:
 		fmt.Printf("Not found")
-	case err2 != nil:
-		panic(err2)
+	case err != nil:
+		panic(err)
 	default:
-		fmt.Printf("id: %d, title: %s\n", id2, title)
 	}
+
+	annotation = NewAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude)
+
+	return *annotation
 }
 
 func updateAnnotation(id int) {

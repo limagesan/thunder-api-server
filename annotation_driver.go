@@ -195,11 +195,11 @@ func getAnnotations(headTime time.Time, tailTime time.Time) FullAnnotations {
 	return annotations
 }
 
-func getAnnotation(id int) Annotation {
-	var annotation *Annotation
+func getAnnotation(id int) FullAnnotation {
+	var annotation *FullAnnotation
 
 	row := db.QueryRow(
-		`select * from annotations where id=$1`,
+		`select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where annotations.id=$1`,
 		id,
 	)
 
@@ -217,7 +217,9 @@ func getAnnotation(id int) Annotation {
 	var SourceURLs string
 	var LocationName string
 	var Coordinate Coordinate
-	if err := row.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude); err != nil {
+	var TagIds string
+	var NiceNum int
+	if err := row.Scan(&ID, &Title, &Artists, &Description, &ArtistImageURLs, &LocationImageURLs, &VideoIds, &StartTime, &EndTime, &TimeText, &PriceText, &SourceURLs, &LocationName, &Coordinate.Latitude, &Coordinate.Longitude, &TagIds, &NiceNum); err != nil {
 		log.Fatal("rows.Scan()", err)
 		return *annotation
 	}
@@ -231,7 +233,7 @@ func getAnnotation(id int) Annotation {
 	default:
 	}
 
-	annotation = NewAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude)
+	annotation = NewFullAnnotation(ID, Title, stringToSlice(Artists), Description, stringToSlice(ArtistImageURLs), stringToSlice(LocationImageURLs), stringToSlice(VideoIds), StartTime, EndTime, TimeText, PriceText, stringToSlice(SourceURLs), LocationName, Coordinate.Latitude, Coordinate.Longitude, stringToIntSlice(TagIds), NiceNum)
 
 	return *annotation
 }

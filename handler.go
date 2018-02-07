@@ -193,7 +193,7 @@ func TagDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func IncrementNiceNum(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, _ := strconv.Atoi(ps.ByName("annotationId"))
-
+	fmt.Println("Host", r.Host, "remoteAddr", r.RemoteAddr)
 	transAnnotation := incrementNiceNum(id)
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(transAnnotation); err != nil {

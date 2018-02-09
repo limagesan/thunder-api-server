@@ -50,7 +50,6 @@ func returnMonth(month int) (time.Month, error) {
 }
 
 func AnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	w.WriteHeader(http.StatusOK)
 

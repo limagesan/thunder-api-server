@@ -29,6 +29,10 @@ func IDShouldBeInt(h httprouter.Handle, name string, idNames []string) httproute
 
 func CommonHeaders(h httprouter.Handle, name string) httprouter.Handle {
 	return Logging(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+		// 開発用
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		h(w, r, ps)
 	}, name)

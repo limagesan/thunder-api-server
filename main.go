@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +29,7 @@ func main() {
 		log.Fatalf("Error opening database: %q", err)
 	}
 	defer db.Close()
-
+	fmt.Println("kuru-")
 	createAnnotationTable()
 	createTransAnnotationTable()
 	createTagTable()

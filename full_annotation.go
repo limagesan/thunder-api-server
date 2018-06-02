@@ -15,13 +15,14 @@ type FullAnnotation struct {
 	SourceURLs        []string   `json:"sourceURLs"`
 	LocationName      string     `json:"locationName"`
 	Coordinate        Coordinate `json:"coordinate"`
+	AreaId            int        `json:"areaId"`
 	TagIds            []int      `json:"tagIds"`
 	NiceNum           int        `json:"niceNum"`
 }
 
 type FullAnnotations []FullAnnotation
 
-func NewFullAnnotation(ID int, Title string, Artists []string, Description string, ArtistImageURLs []string, LocationImageURLs []string, VideoIds []string, StartTime string, EndTime string, TimeText string, PriceText string, SourceURLs []string, LocationName string, Latitude float64, Longitude float64, TagIds []int, NiceNum int) *FullAnnotation {
+func NewFullAnnotation(ID int, Title string, Artists []string, Description string, ArtistImageURLs []string, LocationImageURLs []string, VideoIds []string, StartTime string, EndTime string, TimeText string, PriceText string, SourceURLs []string, LocationName string, Latitude float64, Longitude float64, AreaId int, TagIds []int, NiceNum int) *FullAnnotation {
 	p := new(FullAnnotation)
 	p.ID = ID
 	p.Title = Title
@@ -38,6 +39,7 @@ func NewFullAnnotation(ID int, Title string, Artists []string, Description strin
 	p.LocationName = LocationName
 	p.Coordinate.Latitude = Latitude
 	p.Coordinate.Longitude = Longitude
+	p.AreaId = AreaId
 	p.TagIds = TagIds
 	p.NiceNum = NiceNum
 

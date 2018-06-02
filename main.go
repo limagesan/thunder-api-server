@@ -45,6 +45,7 @@ func main() {
 	router.GET("/annotations/:annotationId", IDShouldBeInt(AnnotationShow, "annotation-show", []string{"annotationId"}))
 
 	router.GET("/select/annotations/:year/:month/:day/:hour/:min", IDShouldBeInt(SelectAnnotationIndex, "annotation-select-index", []string{"year", "month", "day", "hour", "min"}))
+	router.GET("/select/annotations/featured/:areaId/:month/:day", IDShouldBeInt(SelectFeaturedAnnotationIndex, "annotation-select-featured-index", []string{"areaId", "year", "month", "day"}))
 
 	router.GET("/trans/annotations", CommonHeaders(TransAnnotationIndex, "trans-annotation-index"))
 	router.GET("/trans/annotations/:annotationId", IDShouldBeInt(TransAnnotationShow, "trans-annotation-show", []string{"annotationId"}))

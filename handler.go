@@ -94,18 +94,19 @@ func SelectAnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 }
 
-func SelectFeaturedAnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func SelectByAreaAnnotationIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
 	areaId, _ := strconv.Atoi(ps.ByName("areaId"))
 	year, _ := strconv.Atoi(ps.ByName("year"))
 	monthInt, _ := strconv.Atoi(ps.ByName("month"))
 	month, _ := returnMonth(monthInt)
 	day, _ := strconv.Atoi(ps.ByName("day"))
+	featured, _ := strconv.ParseBool(ps.ByName("featured"))
 
 	headTime := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	tailTime := headTime.Add(24 * time.Hour)
 
-	annotations := getFeaturedAnnotations(areaId, headTime, tailTime)
+	annotations := getAnnotationsByArea(areaId, headTime, tailTime, featured)
 
 	if err := json.NewEncoder(w).Encode(annotations); err != nil {
 		panic(err)

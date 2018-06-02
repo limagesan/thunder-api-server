@@ -198,9 +198,17 @@ func getAnnotations(headTime time.Time, tailTime time.Time) FullAnnotations {
 	return annotations
 }
 
-func getFeaturedAnnotations(areaId int, headTime time.Time, tailTime time.Time) FullAnnotations {
+func getAnnotationsByArea(areaId int, headTime time.Time, tailTime time.Time, featured bool) FullAnnotations {
+
+	var query string
+	if featured {
+		query = `select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where featured=true and areaid=$1 and $2 < endtime and starttime < $3 order by nicenum desc`
+	} else {
+		query = `select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where areaid=$1 and $2 < endtime and starttime < $3 order by nicenum desc`
+	}
+
 	rows, err := db.Query(
-		`select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where featured=true and areaid=$1 and $2 < endtime and starttime < $3 order by starttime`,
+		query,
 		areaId,
 		headTime.String(),
 		tailTime.String(),

@@ -107,6 +107,9 @@ func SelectByAreaAnnotationIndex(w http.ResponseWriter, r *http.Request, ps http
 	tailTime := headTime.Add(24 * time.Hour)
 
 	annotations := getAnnotationsByArea(areaId, headTime, tailTime, featured)
+	if len(annotations) == 0 {
+		annotations = []FullAnnotation{}
+	}
 
 	if err := json.NewEncoder(w).Encode(annotations); err != nil {
 		panic(err)

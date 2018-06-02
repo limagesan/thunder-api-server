@@ -26,7 +26,7 @@ func copyAnnotations() {
 		log.Fatalf("Error opening database: %q", err)
 	}
 	defer _db.Close()
-	rows, err := _db.Query(`select * from annotations`)
+	rows, err := _db.Query(`select id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid from annotations`)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +72,7 @@ func copyAnnotations() {
 func addNewAnnotation(annotation Annotation) {
 	var id int
 	rows, err := db.Query(
-		`insert into "annotations" (title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid) select $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15 where not exists(select * from annotations where title = $15) returning id`,
+		`insert into "annotations" (title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid) select $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15 where not exists(select * from annotations where title = $16) returning id`,
 		annotation.Title, sliceToString(annotation.Artists), annotation.Description, sliceToString(annotation.ArtistImageURLs), sliceToString(annotation.LocationImageURLs), sliceToString(annotation.VideoIds), annotation.StartTime, annotation.EndTime, annotation.TimeText, annotation.PriceText, sliceToString(annotation.SourceURLs), annotation.LocationName, annotation.Coordinate.Latitude, annotation.Coordinate.Longitude, annotation.AreaId, annotation.Title)
 	if err != nil {
 		panic(err)
@@ -200,7 +200,7 @@ func getAnnotations(headTime time.Time, tailTime time.Time) FullAnnotations {
 
 func getFeaturedAnnotations(areaId int, headTime time.Time, tailTime time.Time) FullAnnotations {
 	rows, err := db.Query(
-		`select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where areaid = $1 and $2 < endtime and starttime < $3 order by starttime`,
+		`select annotations.id, title, artists, description, artistimageurls, locationimageurls, videoids, starttime, endtime, timetext, pricetext, sourceurls, locationname, latitude, longitude, areaid, tagids, nicenum from annotations inner join transannotations on annotations.id = transannotations.id where featured=true and areaid=$1 and $2 < endtime and starttime < $3 order by starttime`,
 		areaId,
 		headTime.String(),
 		tailTime.String(),

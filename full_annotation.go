@@ -18,6 +18,7 @@ type FullAnnotation struct {
 	AreaId            int        `json:"areaId"`
 	TagIds            []int      `json:"tagIds"`
 	NiceNum           int        `json:"niceNum"`
+	Featured          bool       `json:"featured"`
 }
 
 type FullAnnotations []FullAnnotation
@@ -42,6 +43,7 @@ func NewFullAnnotation(ID int, Title string, Artists []string, Description strin
 	p.AreaId = AreaId
 	p.TagIds = TagIds
 	p.NiceNum = NiceNum
+	p.Featured = false
 
 	return p
 }

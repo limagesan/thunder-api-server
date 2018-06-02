@@ -1,18 +1,20 @@
 package main
 
 type TransAnnotation struct {
-	ID      int   `json:"id"`
-	TagIds  []int `json:"tagIds"`
-	NiceNum int   `json:"niceNum"`
+	ID       int   `json:"id"`
+	TagIds   []int `json:"tagIds"`
+	NiceNum  int   `json:"niceNum"`
+	Featured bool  `json:"featured"`
 }
 
 type TransAnnotations []TransAnnotation
 
-func NewTransAnnotation(ID int, TagIds []int, NiceNum int) *TransAnnotation {
+func NewTransAnnotation(ID int, TagIds []int, NiceNum int, Featured bool) *TransAnnotation {
 	p := new(TransAnnotation)
 	p.ID = ID
 	p.TagIds = TagIds
 	p.NiceNum = NiceNum
+	p.Featured = Featured
 	return p
 }
 

@@ -43,7 +43,7 @@ func updateTransAnnotationsDB() {
 	for i := 0; i < len(willAddIds); i++ {
 		var tagIds []int
 
-		annotation := NewTransAnnotation(willAddIds[i], tagIds, 0)
+		annotation := NewTransAnnotation(willAddIds[i], tagIds, 0, false)
 		insertTransAnnotation(*annotation)
 	}
 
@@ -64,7 +64,7 @@ func createTransAnnotationTable() {
 func insertTransAnnotation(transAnnotation TransAnnotation) {
 	var id int
 	err := db.QueryRow(
-		`insert into transannotations (id, tagids, nicenum) values ($1,$2,$3) returning id`,
+		`insert into transannotations (id, tagids, nicenum, featured) values ($1,$2,$3,false) returning id`,
 		transAnnotation.ID, intSliceToString(transAnnotation.TagIds), transAnnotation.NiceNum).Scan(&id)
 	if err != nil {
 		panic(err)
@@ -86,16 +86,17 @@ func getTransAnnotations() TransAnnotations {
 		var ID int
 		var TagIds string
 		var NiceNum int
+		var Featured bool
 
 		// カーソルから値を取得
-		if err := rows.Scan(&ID, &TagIds, &NiceNum); err != nil {
+		if err := rows.Scan(&ID, &TagIds, &NiceNum, &Featured); err != nil {
 			log.Fatal("rows.Scan()", err)
 			return transAnnotations
 		}
-		transAnnotation := NewTransAnnotation(ID, stringToIntSlice(TagIds), NiceNum)
+		transAnnotation := NewTransAnnotation(ID, stringToIntSlice(TagIds), NiceNum, Featured)
 		transAnnotations = append(transAnnotations, *transAnnotation)
 
-		fmt.Printf("ID: %d, TagIds: %s, NiceNum: %d", ID, TagIds, NiceNum)
+		fmt.Printf("ID: %d, TagIds: %s, NiceNum: %d, Featured: %t\n", ID, TagIds, NiceNum, Featured)
 	}
 	return transAnnotations
 }
@@ -109,7 +110,8 @@ func getTransAnnotation(id int) TransAnnotation {
 	var id2 int
 	var tagIds string
 	var niceNum int
-	err2 := row.Scan(&id2, &tagIds, &niceNum)
+	var featured bool
+	err2 := row.Scan(&id2, &tagIds, &niceNum, &featured)
 
 	// エラー内容による分岐
 	switch {
@@ -118,10 +120,10 @@ func getTransAnnotation(id int) TransAnnotation {
 	case err2 != nil:
 		panic(err2)
 	default:
-		fmt.Printf("id: %d, tagIds: %s, niceNum: %d\n", id2, tagIds, niceNum)
+		fmt.Printf("id: %d, tagIds: %s, niceNum: %d, featured: %t\n", id2, tagIds, niceNum, featured)
 	}
 
-	transAnnotation := NewTransAnnotation(id2, stringToIntSlice(tagIds), niceNum)
+	transAnnotation := NewTransAnnotation(id2, stringToIntSlice(tagIds), niceNum, featured)
 	return *transAnnotation
 }
 
@@ -177,6 +179,26 @@ func deleteTransAnnotation(id int) {
 	}
 
 	fmt.Printf("affected by delete: %d\n", affect)
+}
+
+func updateFeatured(id int, featured bool) {
+	// 更新
+	res, err := db.Exec(
+		`update transannotations set featured=$1 where id=$2`,
+		featured,
+		id)
+	if err != nil {
+		panic(err)
+	}
+
+	// 更新されたレコード数
+	affect, err := res.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("affected by update: %d\n", affect)
+	return
 }
 
 func incrementNiceNum(id int) TransAnnotation {

@@ -210,6 +210,22 @@ func TagDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.WriteHeader(204) // 204 No Content
 }
 
+func UpdateFeatured(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("annotationId"))
+	featured, err2 := strconv.ParseBool(ps.ByName("featured"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	if err2 != nil {
+		w.WriteHeader(400)
+		return
+	}
+	fmt.Println("Host", r.Host, "remoteAddr", r.RemoteAddr)
+	updateFeatured(id, featured)
+	w.WriteHeader(http.StatusAccepted)
+}
+
 func IncrementNiceNum(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, _ := strconv.Atoi(ps.ByName("annotationId"))
 	fmt.Println("Host", r.Host, "remoteAddr", r.RemoteAddr)

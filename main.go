@@ -55,6 +55,8 @@ func main() {
 	router.POST("/tags", CommonHeaders(TagCreate, "tag-create"))
 	router.DELETE("/tags/:tagId", IDShouldBeInt(TagDelete, "tag-delete", []string{"tagId"}))
 
+	router.GET("/areas", CommonHeaders(AreaIndex, "area-index"))
+
 	router.POST("/trans/annotations/:annotationId/niceNum/increment", IDShouldBeInt(IncrementNiceNum, "increment-niceNum", []string{"annotationId"}))
 	router.POST("/trans/annotations/:annotationId/niceNum/decrement", IDShouldBeInt(DecrementNiceNum, "decrement-niceNum", []string{"annotationId"}))
 	router.POST("/trans/annotations/:annotationId/updateFeatured/:featured", IDShouldBeInt(UpdateFeatured, "update-featured", []string{"annotationId"}))

@@ -164,6 +164,15 @@ func TransAnnotationUpdate(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 }
 
+func AreaIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
+
+	areas := getAreas()
+	if err := json.NewEncoder(w).Encode(areas); err != nil {
+		panic(err)
+	}
+}
+
 func TagIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
 

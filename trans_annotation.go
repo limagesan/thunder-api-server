@@ -33,3 +33,19 @@ func NewTag(ID int, Name string, Color string) *Tag {
 	p.Color = Color
 	return p
 }
+
+type Area struct {
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	NameJp string `json:"name_jp"`
+}
+
+type Areas []Area
+
+func NewArea(ID int, Name string, NameJp string) *Area {
+	p := new(Area)
+	p.ID = ID
+	p.Name = Name
+	p.NameJp = NameJp
+	return p
+}

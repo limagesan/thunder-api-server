@@ -29,6 +29,34 @@ func insertTag(tag Tag) int {
 	return int(id)
 }
 
+func getAreas() Areas {
+	// 複数レコード取得
+	rows, err := db.Query(`select * from areas`)
+	if err != nil {
+		panic(err)
+	}
+	var areas Areas
+	// 処理が終わったらカーソルを閉じる
+	defer rows.Close()
+	for rows.Next() {
+
+		var ID int
+		var Name string
+		var NameJp string
+
+		// カーソルから値を取得
+		if err := rows.Scan(&ID, &Name, &NameJp); err != nil {
+			log.Fatal("rows.Scan()", err)
+			return areas
+		}
+		area := NewArea(ID, Name, NameJp)
+		areas = append(areas, *area)
+
+		fmt.Printf("ID: %d, Name: %s, NameJp: %s", ID, Name, NameJp)
+	}
+	return areas
+}
+
 func getTags() Tags {
 	// 複数レコード取得
 	rows, err := db.Query(`select * from tags`)

@@ -23,7 +23,7 @@ type FullAnnotation struct {
 
 type FullAnnotations []FullAnnotation
 
-func NewFullAnnotation(ID int, Title string, Artists []string, Description string, ArtistImageURLs []string, LocationImageURLs []string, VideoIds []string, StartTime string, EndTime string, TimeText string, PriceText string, SourceURLs []string, LocationName string, Latitude float64, Longitude float64, AreaId int, TagIds []int, NiceNum int) *FullAnnotation {
+func NewFullAnnotation(ID int, Title string, Artists []string, Description string, ArtistImageURLs []string, LocationImageURLs []string, VideoIds []string, StartTime string, EndTime string, TimeText string, PriceText string, SourceURLs []string, LocationName string, Latitude float64, Longitude float64, AreaId int, TagIds []int, NiceNum int, Featured bool) *FullAnnotation {
 	p := new(FullAnnotation)
 	p.ID = ID
 	p.Title = Title
@@ -43,7 +43,7 @@ func NewFullAnnotation(ID int, Title string, Artists []string, Description strin
 	p.AreaId = AreaId
 	p.TagIds = TagIds
 	p.NiceNum = NiceNum
-	p.Featured = false
+	p.Featured = Featured
 
 	return p
 }

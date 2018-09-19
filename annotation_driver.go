@@ -21,7 +21,7 @@ func removeAllAnnotations() {
 }
 
 func copyAnnotations() {
-	_db, err := sql.Open("postgres", "user=hiroki dbname=thunder-scrape sslmode=disable")
+	_db, err := sql.Open("postgres", "user=limage dbname=thunder-scrape sslmode=disable")
 	if err != nil {
 		log.Fatalf("Error opening database: %q", err)
 	}

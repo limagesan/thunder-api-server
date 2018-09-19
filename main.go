@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	connStr string = "user=hiroki dbname=thunder-prod sslmode=disable"
+	connStr string = "user=limage dbname=thunder-prod sslmode=disable"
 	db      *sql.DB
 	err     error
 )

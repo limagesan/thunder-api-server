@@ -54,7 +54,7 @@ func updateTransAnnotationsDB() {
 
 func createTransAnnotationTable() {
 	_, err = db.Exec(
-		`create table if not exists "transannotations" ("id" integer primary key unique, "tagids" text, "nicenum" integer)`,
+		`create table if not exists "transannotations" ("id" integer primary key unique, "tagids" text, "nicenum" integer, "featured" boolean)`,
 	)
 	if err != nil {
 		panic(err)
